@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "animalia:blocks/decorative_mud"
+  }
+}

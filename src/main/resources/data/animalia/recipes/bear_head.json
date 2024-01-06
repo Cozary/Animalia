@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "mmm",
+    "mxm",
+    "m m"
+  ],
+  "key": {
+    "m": {
+      "item": "animalia:bear_leather"
+    },
+    "x": {
+      "item": "minecraft:leather_helmet"
+    }
+  },
+  "result": {
+    "item": "animalia:bear_head",
+    "count": 1
+  }
+}

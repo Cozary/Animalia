@@ -1,0 +1,322 @@
+{
+  "entity.walrus.ambient": {
+    "category": "entity",
+    "subtitle": "Walrus roar",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.walrus.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.walrus.death": {
+    "category": "entity",
+    "subtitle": "Walrus dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.walrus.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.walrus.hurt": {
+    "category": "entity",
+    "subtitle": "Walrus hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.walrus.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.playpatus.ambient": {
+    "category": "entity",
+    "subtitle": "Playpatus",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.playpatus.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.lilygator.ambient": {
+    "category": "entity",
+    "subtitle": "Lilygator roar",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.lilygator.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.lilygator.death": {
+    "category": "entity",
+    "subtitle": "Lilygator dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.lilygator.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.lilygator.roar": {
+    "category": "entity",
+    "subtitle": "Lilygator attack",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.lilygator.roars",
+        "stream": true
+      }
+    ]
+  },
+  "entity.snail.ambient": {
+    "category": "entity",
+    "subtitle": "Snail crawl",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.snail.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.snail.death": {
+    "category": "entity",
+    "subtitle": "Snail dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.snail.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.snail.hurt": {
+    "category": "entity",
+    "subtitle": "Snail hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.snail.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.bull.ambient": {
+    "category": "entity",
+    "subtitle": "Bull mooing",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.bull.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.bull.death": {
+    "category": "entity",
+    "subtitle": "Bull dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.bull.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.bull.hurt": {
+    "category": "entity",
+    "subtitle": "Bull hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.bull.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.eagle.ambient": {
+    "category": "entity",
+    "subtitle": "Eagle squeak",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.eagle.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.eagle.death": {
+    "category": "entity",
+    "subtitle": "Eagle dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.eagle.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.eagle.hurt": {
+    "category": "entity",
+    "subtitle": "Eagle hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.eagle.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.hippopotamus.ambient": {
+    "category": "entity",
+    "subtitle": "Hippopotamus roar",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.hippopotamus.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.hippopotamus.death": {
+    "category": "entity",
+    "subtitle": "Hippopotamus dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.hippopotamus.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.hippopotamus.hurt": {
+    "category": "entity",
+    "subtitle": "Hippopotamus hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.hippopotamus.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.brown_bear.ambient": {
+    "category": "entity",
+    "subtitle": "Brown Bear roar",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.brown_bear.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.brown_bear.death": {
+    "category": "entity",
+    "subtitle": "Brown Bear dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.brown_bear.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.brown_bear.hurt": {
+    "category": "entity",
+    "subtitle": "Brown Bear hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.brown_bear.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "item.music_disc_spain": {
+    "category": "item",
+    "subtitle": "Music Disc Spain",
+    "sounds": [
+      {
+        "name": "animalia:item/music_disc_spain",
+        "stream": true
+      }
+    ]
+  },
+  "entity.jellyfish.ambient": {
+    "category": "entity",
+    "subtitle": "Jellyfish buzz",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.jellyfish.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.jellyfish.death": {
+    "category": "entity",
+    "subtitle": "Jellyfish dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.jellyfish.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.jellyfish.hurt": {
+    "category": "entity",
+    "subtitle": "Jellyfish hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.jellyfish.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.white_shark.ambient": {
+    "category": "entity",
+    "subtitle": "White Shark roar",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.white_shark.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.white_shark.death": {
+    "category": "entity",
+    "subtitle": "White Shark dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.white_shark.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.white_shark.hurt": {
+    "category": "entity",
+    "subtitle": "White Shark hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.white_shark.hurt",
+        "stream": true
+      }
+    ]
+  },
+  "entity.vulture.ambient": {
+    "category": "entity",
+    "subtitle": "Vulture squeak",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.vulture.ambient",
+        "stream": true
+      }
+    ]
+  },
+  "entity.vulture.death": {
+    "category": "entity",
+    "subtitle": "Vulture dead",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.vulture.death",
+        "stream": true
+      }
+    ]
+  },
+  "entity.vulture.hurt": {
+    "category": "entity",
+    "subtitle": "Vulture hurts",
+    "sounds": [
+      {
+        "name": "animalia:entity/entity.vulture.hurt",
+        "stream": true
+      }
+    ]
+  }
+}

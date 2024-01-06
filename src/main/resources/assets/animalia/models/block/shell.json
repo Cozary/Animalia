@@ -1,0 +1,12 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "particle": "animalia:blocks/shell_top",
+    "up": "animalia:blocks/shell_top",
+    "down": "animalia:blocks/shell_top",
+    "north": "animalia:blocks/shell_front",
+    "east": "animalia:blocks/shell_side",
+    "west": "animalia:blocks/shell_side",
+    "south": "animalia:blocks/shell_front"
+  }
+}

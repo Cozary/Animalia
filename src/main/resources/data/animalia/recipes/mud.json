@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "animalia:mud_bucket"
+    }
+  ],
+  "result": {
+    "item": "animalia:mud",
+    "count": 16
+  }
+}

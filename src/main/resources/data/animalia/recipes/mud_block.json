@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    " mm",
+    " mm"
+  ],
+  "key": {
+    "m": {
+      "item": "animalia:mud"
+    }
+  },
+  "result": {
+    "item": "animalia:mud_block_item",
+    "count": 4
+  }
+}

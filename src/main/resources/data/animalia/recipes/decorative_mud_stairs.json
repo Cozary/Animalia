@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "m  ",
+    "mm ",
+    "mmm"
+  ],
+  "key": {
+    "m": {
+      "item": "animalia:hardened_mud_item"
+    }
+  },
+  "result": {
+    "item": "animalia:decorative_mud_stairs_item",
+    "count": 4
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " m ",
+    " m ",
+    " x "
+  ],
+  "key": {
+    "m": {
+      "item": "animalia:walrus_fang"
+    },
+    "x": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "animalia:north_pole",
+    "count": 1
+  }
+}

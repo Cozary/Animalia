@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "tst",
+    "   "
+  ],
+  "key": {
+    "s": {
+      "item": "animalia:shell_item"
+    },
+    "t": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "animalia:shell_armor",
+    "count": 1
+  }
+}

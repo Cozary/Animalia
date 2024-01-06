@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "mm ",
+    "mmm",
+    "mm "
+  ],
+  "key": {
+    "m": {
+      "item": "animalia:shark_scale"
+    }
+  },
+  "result": {
+    "item": "animalia:fins",
+    "count": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "animalia:block/decorative_mud_slab"
+    },
+    "type=top": {
+      "model": "animalia:block/decorative_mud_slab_top"
+    },
+    "type=double": {
+      "model": "animalia:block/decorative_mud_slab"
+    }
+  }
+}

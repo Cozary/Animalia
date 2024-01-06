@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "animalia:bear_meat"
+  },
+  "result": "animalia:cooked_bear_meat",
+  "experience": 1.0,
+  "cookingtime": 250
+}

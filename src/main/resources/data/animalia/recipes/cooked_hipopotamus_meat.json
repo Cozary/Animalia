@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "animalia:hippopotamus_meat"
+  },
+  "result": "animalia:cooked_hippopotamus_meat",
+  "experience": 1.0,
+  "cookingtime": 150
+}

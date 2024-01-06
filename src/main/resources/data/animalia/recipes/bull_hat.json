@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "mxm",
+    "   "
+  ],
+  "key": {
+    "m": {
+      "item": "animalia:bull_horn"
+    },
+    "x": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "animalia:bull_hat",
+    "count": 1
+  }
+}

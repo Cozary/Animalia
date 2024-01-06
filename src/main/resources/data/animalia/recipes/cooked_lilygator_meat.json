@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "animalia:lilygator_meat"
+  },
+  "result": "animalia:cooked_lilygator_meat",
+  "experience": 1.0,
+  "cookingtime": 350
+}

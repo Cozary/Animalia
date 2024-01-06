@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "animalia:mud_block_item"
+  },
+  "result": "animalia:hardened_mud_item",
+  "experience": 1.0,
+  "cookingtime": 200
+}
