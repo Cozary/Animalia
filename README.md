@@ -1,5 +1,7 @@
 # Animalia
 
+***This mod will not continue to be updated.***
+
 Looking for a mod that adds new animals to add to the game? This is your mod.
 Currently adds 12 mobs including the Walrus and the cute Dirty Pig with its special biome, the Muddy Swamp, a totally peaceful biome ^^
 
