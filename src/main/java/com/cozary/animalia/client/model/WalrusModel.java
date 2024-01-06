@@ -23,43 +23,47 @@ package com.cozary.animalia.client.model;
 
 import com.cozary.animalia.entities.WalrusEntity;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.entity.model.AgeableModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.util.Mth;
 
-public class WalrusModel<T extends WalrusEntity> extends AgeableModel<T> {
-    private final ModelRenderer head;
-    private final ModelRenderer body;
-    private final ModelRenderer tail;
-    private final ModelRenderer legFrontRight;
-    private final ModelRenderer legFrontLeft;
+public class WalrusModel<T extends WalrusEntity> extends AgeableListModel<T> {
+    private final ModelPart head;
+    private final ModelPart body;
+    private final ModelPart tail;
+    private final ModelPart legFrontRight;
+    private final ModelPart legFrontLeft;
 
-    public WalrusModel() {
-        texWidth = 128;
-        texHeight = 128;
+    public WalrusModel(ModelPart root) {
+        this.head = root.getChild("head");
+        this.body = root.getChild("body");
+        this.tail = root.getChild("tail");
+        this.legFrontRight = root.getChild("legFrontRight");
+        this.legFrontLeft = root.getChild("legFrontLeft");
+    }
 
-        head = new ModelRenderer(this);
-        head.setPos(0.0F, 12.0F, -9.0F);
-        head.texOffs(32, 32).addBox(-3.0F, -5.0F, -6.0F, 6.0F, 5.0F, 7.0F, 0.0F, false);
-        head.texOffs(4, 8).addBox(-2.0F, 0.0F, -6.0F, 1.0F, 6.0F, 1.0F, 0.0F, false);
-        head.texOffs(0, 8).addBox(1.0F, 0.0F, -6.0F, 1.0F, 6.0F, 1.0F, 0.0F, false);
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
 
-        body = new ModelRenderer(this);
-        body.setPos(-1.0F, 20.0F, 1.0F);
-        body.texOffs(0, 0).addBox(-5.0F, -8.0F, -11.0F, 12.0F, 11.0F, 20.0F, 0.0F, false);
-        body.texOffs(0, 31).addBox(-3.0F, -4.0F, 9.0F, 8.0F, 8.0F, 8.0F, 0.0F, false);
+        PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(32, 32).addBox(-3.0F, -5.0F, -6.0F, 6.0F, 5.0F, 7.0F, new CubeDeformation(0.0F))
+                .texOffs(4, 8).addBox(-2.0F, 0.0F, -6.0F, 1.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 8).addBox(1.0F, 0.0F, -6.0F, 1.0F, 6.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 12.0F, -9.0F));
 
-        tail = new ModelRenderer(this);
-        tail.setPos(-1.0F, 20.5F, 10.0F);
-        tail.texOffs(0, 0).addBox(-1.0F, 0.5F, 8.0F, 4.0F, 3.0F, 5.0F, 0.0F, false);
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-5.0F, -8.0F, -11.0F, 12.0F, 11.0F, 20.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 31).addBox(-3.0F, -4.0F, 9.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.0F, 20.0F, 1.0F));
 
-        legFrontRight = new ModelRenderer(this);
-        legFrontRight.setPos(-4.0F, 23.5F, -7.0F);
-        legFrontRight.texOffs(44, 0).addBox(-5.0F, -0.5F, -6.0F, 5.0F, 1.0F, 6.0F, 0.0F, false);
+        PartDefinition tail = partdefinition.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(0, 0).addBox(-1.0F, 0.5F, 8.0F, 4.0F, 3.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.0F, 20.5F, 10.0F));
 
-        legFrontLeft = new ModelRenderer(this);
-        legFrontLeft.setPos(4.0F, 23.5F, -8.0F);
-        legFrontLeft.texOffs(26, 44).addBox(0.0F, -0.5F, -6.0F, 5.0F, 1.0F, 6.0F, 0.0F, false);
+        PartDefinition legFrontRight = partdefinition.addOrReplaceChild("legFrontRight", CubeListBuilder.create().texOffs(44, 0).addBox(-5.0F, -0.5F, -6.0F, 5.0F, 1.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(-4.0F, 23.5F, -7.0F));
+
+        PartDefinition legFrontLeft = partdefinition.addOrReplaceChild("legFrontLeft", CubeListBuilder.create().texOffs(26, 44).addBox(0.0F, -0.5F, -6.0F, 5.0F, 1.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(4.0F, 23.5F, -8.0F));
+
+        return LayerDefinition.create(meshdefinition, 128, 128);
     }
 
 
@@ -67,8 +71,8 @@ public class WalrusModel<T extends WalrusEntity> extends AgeableModel<T> {
     public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.head.xRot = headPitch * ((float) Math.PI / 180F);
         this.head.y = netHeadYaw * ((float) Math.PI / 180F);
-        this.legFrontRight.yRot = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-        this.legFrontLeft.yRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+        this.legFrontRight.yRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+        this.legFrontLeft.yRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
         if (entityIn.isBaby()) {
             this.head.z = -6F;
             this.head.y = 13;
@@ -80,18 +84,27 @@ public class WalrusModel<T extends WalrusEntity> extends AgeableModel<T> {
     }
 
     @Override
-    protected Iterable<ModelRenderer> headParts() {
+    protected Iterable<ModelPart> headParts() {
         return ImmutableList.of(this.head);
     }
 
     @Override
-    protected Iterable<ModelRenderer> bodyParts() {
+    protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(this.body, this.tail, this.legFrontLeft, this.legFrontRight);
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        head.render(poseStack, buffer, packedLight, packedOverlay);
+        body.render(poseStack, buffer, packedLight, packedOverlay);
+        tail.render(poseStack, buffer, packedLight, packedOverlay);
+        legFrontRight.render(poseStack, buffer, packedLight, packedOverlay);
+        legFrontLeft.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

@@ -22,8 +22,11 @@
 package com.cozary.animalia.items;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+
+import javax.annotation.Nullable;
 
 public class CustomCoal extends Item {
     public CustomCoal() {
@@ -31,7 +34,7 @@ public class CustomCoal extends Item {
     }
 
     @Override
-    public int getBurnTime(ItemStack itemStack) {
+    public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
         return 10000;
     }
 

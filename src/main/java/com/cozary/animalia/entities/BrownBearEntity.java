@@ -24,41 +24,47 @@ package com.cozary.animalia.entities;
 import com.cozary.animalia.init.ModEntityTypes;
 import com.cozary.animalia.init.ModSound;
 import com.google.common.collect.Lists;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.RandomPositionGenerator;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.BeeEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.Path;
-import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.Mth;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Bee;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -69,11 +75,11 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class BrownBearEntity extends AnimalEntity implements IAngerable {
-    private static final DataParameter<Boolean> IS_STANDING = EntityDataManager.defineId(BrownBearEntity.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Integer> EAT_COUNTER = EntityDataManager.defineId(BrownBearEntity.class, DataSerializers.INT);
-    private static final DataParameter<Byte> BEAR_FLAGS = EntityDataManager.defineId(BrownBearEntity.class, DataSerializers.BYTE);
-    private static final RangedInteger field_234217_by_ = TickRangeConverter.rangeOfSeconds(20, 39);
+public class BrownBearEntity extends Animal implements NeutralMob {
+    private static final EntityDataAccessor<Boolean> IS_STANDING = SynchedEntityData.defineId(BrownBearEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> EAT_COUNTER = SynchedEntityData.defineId(BrownBearEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Byte> BEAR_FLAGS = SynchedEntityData.defineId(BrownBearEntity.class, EntityDataSerializers.BYTE);
+    private static final UniformInt field_234217_by_ = TimeUtil.rangeOfSeconds(20, 39);
 
     private static final Predicate<ItemEntity> BEAR_ITEMS = (p_213575_0_) -> {
         Item item = p_213575_0_.getItem().getItem();
@@ -90,24 +96,28 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
     private BlockPos hivePos = null;
     private FindBeehiveGoal findBeehiveGoal;
 
-    public BrownBearEntity(EntityType<? extends BrownBearEntity> type, World worldIn) {
+    public BrownBearEntity(EntityType<? extends BrownBearEntity> type, Level worldIn) {
         super(type, worldIn);
-        this.setPathfindingMalus(PathNodeType.STICKY_HONEY, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.STICKY_HONEY, 0.0F);
         this.moveControl = new MoveHelperController(this);
         if (!this.isBaby()) {
             this.setCanPickUpLoot(true);
         }
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.createMobAttributes()
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 35.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.3D)
                 .add(Attributes.FOLLOW_RANGE, 15.0D)
                 .add(Attributes.ATTACK_DAMAGE, 5.0D);
     }
 
-    public static boolean canBrownBearSpawn(EntityType<? extends DirtyPigEntity> animal, IWorld world, SpawnReason reason, BlockPos pos, Random random) {
+    /**
+     * spawn
+     */
+
+    public static boolean canBrownBearSpawn(EntityType<? extends DirtyPigEntity> animal, LevelAccessor world, MobSpawnType reason, BlockPos pos, Random random) {
         return world.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK) && world.getLightEmission(pos) > 8 && world.canSeeSky(pos);
     }
 
@@ -117,16 +127,16 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         this.goalSelector.addGoal(0, new MeleeAttackGoal());
         this.targetSelector.addGoal(2, new HurtByTargetGoal());
         this.targetSelector.addGoal(1, new AttackPlayerGoal());
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::isAngryAt));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, BeeEntity.class, 10, true, true, null));
-        this.targetSelector.addGoal(5, new ResetAngerGoal<>(this, false));
-        this.goalSelector.addGoal(7, new SwimGoal(this));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Bee.class, 10, true, true, null));
+        this.targetSelector.addGoal(5, new ResetUniversalAngerTargetGoal<>(this, false));
+        this.goalSelector.addGoal(7, new FloatGoal(this));
         this.goalSelector.addGoal(8, new PanicGoal());
         this.goalSelector.addGoal(9, new FollowParentGoal(this, 1.25D));
         this.goalSelector.addGoal(10, new BreedGoal(this, 1.0D));
-        this.goalSelector.addGoal(11, new RandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(12, new LookAtGoal(this, PlayerEntity.class, 6.0F));
-        this.goalSelector.addGoal(13, new LookRandomlyGoal(this));
+        this.goalSelector.addGoal(11, new RandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(12, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(13, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(14, new TemptGoal(this, 1.0D, Ingredient.of(Items.HONEYCOMB), false));
         this.goalSelector.addGoal(15, new SitGoal());
         this.findBeehiveGoal = new FindBeehiveGoal();
@@ -156,60 +166,34 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         return !this.isWithinDistance(pos, 32);
     }
 
-    private void startMovingTo(BlockPos pos) {
-        Vector3d vector3d = Vector3d.atBottomCenterOf(pos);
-        int i = 0;
-        BlockPos blockpos = this.blockPosition();
-        int j = (int) vector3d.y - blockpos.getY();
-        if (j > 2) {
-            i = 4;
-        } else if (j < -2) {
-            i = -4;
-        }
-
-        int k = 6;
-        int l = 8;
-        int i1 = blockpos.distManhattan(pos);
-        if (i1 < 15) {
-            k = i1 / 2;
-            l = i1 / 2;
-        }
-
-        Vector3d vector3d1 = RandomPositionGenerator.getAirPosTowards(this, k, l, i, vector3d, (float) Math.PI / 10F);
-        if (vector3d1 != null) {
-            this.navigation.setMaxVisitedNodesMultiplier(0.5F);
-            this.navigation.moveTo(vector3d1.x, vector3d1.y, vector3d1.z, 1.0D);
-        }
-    }
-
     @Override
     public boolean canTakeItem(ItemStack itemstackIn) {
-        EquipmentSlotType equipmentslottype = MobEntity.getEquipmentSlotForItem(itemstackIn);
+        EquipmentSlot equipmentslottype = Mob.getEquipmentSlotForItem(itemstackIn);
         if (!this.getItemBySlot(equipmentslottype).isEmpty()) {
             return false;
         } else {
-            return equipmentslottype == EquipmentSlotType.MAINHAND && super.canTakeItem(itemstackIn);
+            return equipmentslottype == EquipmentSlot.MAINHAND && super.canTakeItem(itemstackIn);
         }
     }
 
     private void func_213546_et() {
-        if (!this.func_213578_dZ() && this.func_213556_dX() && !this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty() && this.random.nextInt(80) == 1) {
+        if (!this.func_213578_dZ() && this.func_213556_dX() && !this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty() && this.random.nextInt(80) == 1) {
             this.func_213534_t(true);
-        } else if (this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty() || !this.func_213556_dX()) {
+        } else if (this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty() || !this.func_213556_dX()) {
             this.func_213534_t(false);
         }
 
 
         /**
-         *   start eating
+         *   eat
          */
 
         if (this.func_213578_dZ()) { // && CanEat
             this.func_213533_eu();
             if (!this.level.isClientSide && this.getEatCounter() > 80 && this.random.nextInt(20) == 1) {
-                if (this.getEatCounter() > 100 && this.isBreedingItemOrCake(this.getItemBySlot(EquipmentSlotType.MAINHAND))) {
+                if (this.getEatCounter() > 100 && this.isBreedingItemOrCake(this.getItemBySlot(EquipmentSlot.MAINHAND))) {
                     if (!this.level.isClientSide) {
-                        this.setItemSlot(EquipmentSlotType.MAINHAND, ItemStack.EMPTY);
+                        this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
                     }
                     this.func_213553_r(false);
                 }
@@ -225,63 +209,63 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
             this.playSound(SoundEvents.PANDA_EAT, 0.5F + 0.5F * (float) this.random.nextInt(2), (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
 
             for (int i = 0; i < 6; ++i) {
-                Vector3d vector3d = new Vector3d(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
-                vector3d = vector3d.xRot(-this.xRot * ((float) Math.PI / 180F));
-                vector3d = vector3d.yRot(-this.yRot * ((float) Math.PI / 180F));
+                Vec3 vector3d = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, ((double) this.random.nextFloat() - 0.5D) * 0.1D);
+                vector3d = vector3d.xRot(-this.xRotO * ((float) Math.PI / 180F));
+                vector3d = vector3d.yRot(-this.yRotO * ((float) Math.PI / 180F));
                 double d0 = (double) (-this.random.nextFloat()) * 0.6D - 0.3D;
-                Vector3d vector3d1 = new Vector3d(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
+                Vec3 vector3d1 = new Vec3(((double) this.random.nextFloat() - 0.5D) * 0.8D, d0, 1.0D + ((double) this.random.nextFloat() - 0.5D) * 0.4D);
                 vector3d1 = vector3d1.yRot(-this.yBodyRot * ((float) Math.PI / 180F));
                 vector3d1 = vector3d1.add(this.getX(), this.getEyeY() + 1.0D, this.getZ());
-                this.level.addParticle(new ItemParticleData(ParticleTypes.ITEM, this.getItemBySlot(EquipmentSlotType.MAINHAND)), vector3d1.x, vector3d1.y, vector3d1.z, vector3d.x, vector3d.y + 0.05D, vector3d.z);
+                this.level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, this.getItemBySlot(EquipmentSlot.MAINHAND)), vector3d1.x, vector3d1.y, vector3d1.z, vector3d.x, vector3d.y + 0.05D, vector3d.z);
             }
         }
     }
 
     @Override
     protected void pickUpItem(ItemEntity itemEntity) {
-        if (this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty() && BEAR_ITEMS.test(itemEntity)) {
+        if (this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty() && BEAR_ITEMS.test(itemEntity)) {
             this.onItemPickup(itemEntity);
             ItemStack itemstack = itemEntity.getItem();
-            this.setItemSlot(EquipmentSlotType.MAINHAND, itemstack);
-            this.handDropChances[EquipmentSlotType.MAINHAND.getIndex()] = 2.0F;
+            this.setItemSlot(EquipmentSlot.MAINHAND, itemstack);
+            this.handDropChances[EquipmentSlot.MAINHAND.getIndex()] = 2.0F;
             this.take(itemEntity, itemstack.getCount());
-            itemEntity.remove();
+            itemEntity.remove(RemovalReason.KILLED);
         }
     }
 
     @Override
-    public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         if (this.func_213567_dY()) {
             this.func_213542_s(false);
-            return ActionResultType.sidedSuccess(this.level.isClientSide);
+            return InteractionResult.sidedSuccess(this.level.isClientSide);
         } else if (this.isBreedingItem(itemstack)) {
             if (this.getTarget() != null) {
                 this.gotHoney = true;
             }
             if (this.isBaby()) {
-                this.usePlayerItem(player, itemstack);
+                this.usePlayerItem(player, hand, itemstack);
                 this.ageUp((int) ((float) (-this.getAge() / 20) * 0.1F), true);
             } else if (!this.level.isClientSide && this.getAge() == 0 && this.canFallInLove()) {
-                this.usePlayerItem(player, itemstack);
+                this.usePlayerItem(player, hand, itemstack);
                 this.setInLove(player);
             } else {
                 if (this.level.isClientSide || this.func_213556_dX() || this.isInWater()) {
-                    return ActionResultType.PASS;
+                    return InteractionResult.PASS;
                 }
                 this.tryToSit();
                 this.func_213534_t(true);
-                ItemStack itemstack1 = this.getItemBySlot(EquipmentSlotType.MAINHAND);
-                if (!itemstack1.isEmpty() && !player.abilities.instabuild) {
+                ItemStack itemstack1 = this.getItemBySlot(EquipmentSlot.MAINHAND);
+                if (!itemstack1.isEmpty() && !player.getAbilities().instabuild) {
                     this.spawnAtLocation(itemstack1);
                 }
 
-                this.setItemSlot(EquipmentSlotType.MAINHAND, new ItemStack(itemstack.getItem(), 1));
-                this.usePlayerItem(player, itemstack);
+                this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(itemstack.getItem(), 1));
+                this.usePlayerItem(player, hand, itemstack);
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         } else {
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
         }
     }
 
@@ -309,10 +293,6 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         }
     }
 
-    /**
-     * negate eating
-     */
-
     public boolean canPerformAction() {
         return !this.func_213567_dY() && !this.func_213578_dZ() && !this.func_213564_eh() && !this.func_213556_dX() && !isStanding();
     }
@@ -327,7 +307,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
 
     @OnlyIn(Dist.CLIENT)
     public float getStandingAnimationScale(float p_189795_1_) {
-        return MathHelper.lerp(p_189795_1_, this.clientSideStandAnimation0, this.clientSideStandAnimation) / 6.0F;
+        return Mth.lerp(p_189795_1_, this.clientSideStandAnimation0, this.clientSideStandAnimation) / 6.0F;
     }
 
     /**
@@ -380,7 +360,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         return this.isBreedingItem(stack) || stack.getItem() == Blocks.CAKE.asItem();
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player) {
+    public boolean canBeLeashedTo(Player player) {
         return false;
     }
 
@@ -388,13 +368,13 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
      * Anger
      */
     @Override
-    public void readAdditionalSaveData(CompoundNBT compound) {
+    public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        this.readPersistentAngerSaveData((ServerWorld) this.level, compound);
+        this.readPersistentAngerSaveData(this.level, compound);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundNBT compound) {
+    public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         this.addPersistentAngerSaveData(compound);
     }
@@ -424,7 +404,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
 
     @Override
     public void startPersistentAngerTimer() {
-        this.setRemainingPersistentAngerTime(field_234217_by_.randomValue(this.random));
+        this.setRemainingPersistentAngerTime(field_234217_by_.sample(this.random));
 
     }
 
@@ -485,9 +465,9 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
 
             this.clientSideStandAnimation0 = this.clientSideStandAnimation;
             if (this.isStanding()) {
-                this.clientSideStandAnimation = MathHelper.clamp(this.clientSideStandAnimation + 1.0F, 0.0F, 6.0F);
+                this.clientSideStandAnimation = Mth.clamp(this.clientSideStandAnimation + 1.0F, 0.0F, 6.0F);
             } else {
-                this.clientSideStandAnimation = MathHelper.clamp(this.clientSideStandAnimation - 1.0F, 0.0F, 6.0F);
+                this.clientSideStandAnimation = Mth.clamp(this.clientSideStandAnimation - 1.0F, 0.0F, 6.0F);
             }
         }
         if (this.getTarget() == null) {
@@ -498,21 +478,21 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         }
 
         if (!this.level.isClientSide) {
-            this.updatePersistentAnger((ServerWorld) this.level, true);
+            this.updatePersistentAnger((ServerLevel) this.level, true);
         }
         this.func_213546_et();
 
     }
 
     /**
-     * plus hitbox
+     * hitbox
      *
      * @param poseIn
      * @return
      */
 
     @Override
-    public EntitySize getDimensions(Pose poseIn) {
+    public EntityDimensions getDimensions(Pose poseIn) {
         if (this.clientSideStandAnimation > 0.0F) {
             float f = this.clientSideStandAnimation / 6.0F;
             float f1 = 1.0F + f;
@@ -523,7 +503,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
     }
 
     /**
-     * attack
+     *
      *
      * @param entityIn
      * @return
@@ -539,7 +519,6 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
     }
 
     /**
-     * water slow
      *
      * @return
      */
@@ -550,7 +529,6 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
     }
 
     /**
-     * spawn world
      *
      * @param worldIn
      * @param difficultyIn
@@ -561,15 +539,21 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
      */
 
     @Override
-    public ILivingEntityData finalizeSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, MobSpawnType reason, @Nullable SpawnGroupData spawnDataIn, @Nullable CompoundTag dataTag) {
         if (spawnDataIn == null) {
-            spawnDataIn = new AgeableData(0.1F);
+            spawnDataIn = new AgeableMob.AgeableMobGroupData(0.1F);
         }
         return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
+    @Nullable
     @Override
-    protected int getExperienceReward(PlayerEntity p_70693_1_) {
+    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
+        return ModEntityTypes.BROWN_BEAR.get().create(this.level);
+    }
+
+    @Override
+    protected int getExperienceReward(Player p_70693_1_) {
         return 3 + this.level.random.nextInt(4);
     }
 
@@ -578,18 +562,10 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         return true;
     }
 
-    @Nullable
-    @Override
-    public AgeableEntity getBreedOffspring(ServerWorld p_241840_1_, AgeableEntity p_241840_2_) {
-        return ModEntityTypes.BROWN_BEAR.get().create(this.level);
-    }
-
-
     /**
-     * animations
      */
 
-    static class MoveHelperController extends MovementController {
+    static class MoveHelperController extends MoveControl {
         private final BrownBearEntity panda;
 
         public MoveHelperController(BrownBearEntity pandaIn) {
@@ -640,7 +616,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         private int field_234183_f_;
 
         FindBeehiveGoal() {
-            this.setFlags(EnumSet.of(Flag.MOVE));
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE));
         }
 
         public boolean canBeeStart() {
@@ -683,8 +659,6 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
                     if (!BrownBearEntity.this.isWithinDistance(BrownBearEntity.this.hivePos, 16)) {
                         if (BrownBearEntity.this.isTooFar(BrownBearEntity.this.hivePos)) {
                             this.reset();
-                        } else {
-                            BrownBearEntity.this.startMovingTo(BrownBearEntity.this.hivePos);
                         }
                     } else {
                         boolean flag = this.startMovingToFar(BrownBearEntity.this.hivePos);
@@ -760,7 +734,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         private int field_220832_b;
 
         public SitGoal() {
-            this.setFlags(EnumSet.of(Flag.MOVE));
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE));
         }
 
         /**
@@ -772,7 +746,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         public boolean canUse() {
             if (this.field_220832_b <= BrownBearEntity.this.tickCount && !BrownBearEntity.this.isBaby() && !BrownBearEntity.this.isInWater() && BrownBearEntity.this.canPerformAction()) {
                 List<ItemEntity> list = BrownBearEntity.this.level.getEntitiesOfClass(ItemEntity.class, BrownBearEntity.this.getBoundingBox().inflate(6.0D, 6.0D, 6.0D), BrownBearEntity.BEAR_ITEMS);
-                return !list.isEmpty() || !BrownBearEntity.this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty();
+                return !list.isEmpty() || !BrownBearEntity.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty();
             } else {
                 return false;
             }
@@ -795,7 +769,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
          */
 
         public void tick() {
-            if (!BrownBearEntity.this.func_213556_dX() && !BrownBearEntity.this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty()) {
+            if (!BrownBearEntity.this.func_213556_dX() && !BrownBearEntity.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
                 BrownBearEntity.this.tryToSit();
             }
 
@@ -807,9 +781,9 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
 
         public void start() {
             List<ItemEntity> list = BrownBearEntity.this.level.getEntitiesOfClass(ItemEntity.class, BrownBearEntity.this.getBoundingBox().inflate(8.0D, 8.0D, 8.0D), BrownBearEntity.BEAR_ITEMS);
-            if (!list.isEmpty() && BrownBearEntity.this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty()) {
+            if (!list.isEmpty() && BrownBearEntity.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
                 BrownBearEntity.this.getNavigation().moveTo(list.get(0), 1.2F);
-            } else if (!BrownBearEntity.this.getItemBySlot(EquipmentSlotType.MAINHAND).isEmpty()) {
+            } else if (!BrownBearEntity.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
                 BrownBearEntity.this.tryToSit();
             }
 
@@ -821,10 +795,10 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
          */
 
         public void stop() {
-            ItemStack itemstack = BrownBearEntity.this.getItemBySlot(EquipmentSlotType.MAINHAND);
+            ItemStack itemstack = BrownBearEntity.this.getItemBySlot(EquipmentSlot.MAINHAND);
             if (!itemstack.isEmpty()) {
                 BrownBearEntity.this.spawnAtLocation(itemstack);
-                BrownBearEntity.this.setItemSlot(EquipmentSlotType.MAINHAND, ItemStack.EMPTY);
+                BrownBearEntity.this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
                 int i = BrownBearEntity.this.random.nextInt(150) + 10;
                 this.field_220832_b = BrownBearEntity.this.tickCount + i * 20;
             }
@@ -834,11 +808,10 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
     }
 
     /**
-     * attack player GOAL
      */
-    class AttackPlayerGoal extends NearestAttackableTargetGoal<PlayerEntity> {
+    class AttackPlayerGoal extends NearestAttackableTargetGoal<Player> {
         public AttackPlayerGoal() {
-            super(BrownBearEntity.this, PlayerEntity.class, 20, true, true, null);
+            super(BrownBearEntity.this, Player.class, 20, true, true, null);
         }
 
         /**
@@ -875,7 +848,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
      * HurtBy Goal
      */
 
-    class HurtByTargetGoal extends net.minecraft.entity.ai.goal.HurtByTargetGoal {
+    class HurtByTargetGoal extends net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal {
         public HurtByTargetGoal() {
             super(BrownBearEntity.this);
         }
@@ -894,7 +867,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         }
 
         @Override
-        protected void alertOther(MobEntity mobIn, LivingEntity targetIn) {
+        protected void alertOther(Mob mobIn, LivingEntity targetIn) {
             if (mobIn instanceof BrownBearEntity && !mobIn.isBaby()) {
                 super.alertOther(mobIn, targetIn);
 
@@ -907,7 +880,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
      * MeleeAttack GOAL
      */
 
-    class MeleeAttackGoal extends net.minecraft.entity.ai.goal.MeleeAttackGoal {
+    class MeleeAttackGoal extends net.minecraft.world.entity.ai.goal.MeleeAttackGoal {
 
         public MeleeAttackGoal() {
             super(BrownBearEntity.this, 1.25D, true);
@@ -915,7 +888,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
         }
 
         protected void checkAndPerformAttack(LivingEntity enemy, double distToEnemySqr) {
-            BrownBearEntity.this.setItemInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+            BrownBearEntity.this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             double d0 = this.getAttackReachSqr(enemy);
             if (distToEnemySqr <= d0 && this.isTimeToAttack()) {
                 this.resetAttackCooldown();
@@ -957,7 +930,7 @@ public class BrownBearEntity extends AnimalEntity implements IAngerable {
      * Panic GOAL
      */
 
-    class PanicGoal extends net.minecraft.entity.ai.goal.PanicGoal {
+    class PanicGoal extends net.minecraft.world.entity.ai.goal.PanicGoal {
         public PanicGoal() {
             super(BrownBearEntity.this, 2.0D);
         }

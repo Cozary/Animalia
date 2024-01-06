@@ -22,15 +22,15 @@
 package com.cozary.animalia.blocks;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Food;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 
 public class BlockItemFoodBase extends BlockItem {
 
     public BlockItemFoodBase(Block blockIn) {
         super(blockIn, new Properties().tab(Animalia.TAB)
-                .food((new Food.Builder()
+                .food((new FoodProperties.Builder()
                         .nutrition(18)
                         .meat()
                         .saturationMod(2.7f)

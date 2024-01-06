@@ -21,37 +21,53 @@
 
 package com.cozary.animalia.client.render.armor;
 
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.LivingEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.world.entity.LivingEntity;
 
-public class FinsModel extends BipedModel<LivingEntity> {
+public class FinsModel extends HumanoidModel<LivingEntity> {
 
-    public FinsModel(float modelSize) {
-        super(modelSize, 0.0F, 64, 64);
+    private final ModelPart fins;
 
-        ModelRenderer fins = new ModelRenderer(this);
-        body.addChild(fins);
-        fins.setPos(0.0F, 7.0F, 9.0F);
-        fins.texOffs(16, 32).addBox(-1.0F, -4.0F, -7.0F, 1.0F, 9.0F, 1.0F, 0.0F, false);
-        fins.texOffs(0, 0).addBox(-1.0F, -3.0F, -6.0F, 1.0F, 7.0F, 1.0F, 0.0F, false);
-        fins.texOffs(4, 16).addBox(-1.0F, -2.0F, -5.0F, 1.0F, 5.0F, 1.0F, 0.0F, false);
-        fins.texOffs(28, 0).addBox(-1.0F, -1.0F, -4.0F, 1.0F, 4.0F, 1.0F, 0.0F, false);
-        fins.texOffs(24, 5).addBox(-1.0F, 1.0F, -3.0F, 1.0F, 2.0F, 1.0F, 0.0F, false);
-        fins.texOffs(36, 16).addBox(8.0F, -5.0F, -9.0F, 1.0F, 8.0F, 1.0F, 0.0F, false);
-        fins.texOffs(0, 16).addBox(9.0F, -5.0F, -9.0F, 1.0F, 6.0F, 1.0F, 0.0F, false);
-        fins.texOffs(24, 16).addBox(10.0F, -5.0F, -9.0F, 1.0F, 4.0F, 1.0F, 0.0F, false);
-        fins.texOffs(28, 16).addBox(11.0F, -5.0F, -9.0F, 1.0F, 3.0F, 1.0F, 0.0F, false);
-        fins.texOffs(32, 16).addBox(-9.0F, -5.0F, -9.0F, 1.0F, 8.0F, 1.0F, 0.0F, false);
-        fins.texOffs(4, 0).addBox(-10.0F, -5.0F, -9.0F, 1.0F, 6.0F, 1.0F, 0.0F, false);
-        fins.texOffs(24, 0).addBox(-11.0F, -5.0F, -9.0F, 1.0F, 4.0F, 1.0F, 0.0F, false);
-        fins.texOffs(27, 20).addBox(-12.0F, -5.0F, -9.0F, 1.0F, 3.0F, 1.0F, 0.0F, false);
+    public FinsModel(ModelPart root) {
+        super(root);
+        this.fins = root.getChild("fins");
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+
+        PartDefinition fins = partdefinition.addOrReplaceChild("fins", CubeListBuilder.create().texOffs(16, 32).addBox(-1.0F, -4.0F, -7.0F, 1.0F, 9.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 0).addBox(-1.0F, -3.0F, -6.0F, 1.0F, 7.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(4, 16).addBox(-1.0F, -2.0F, -5.0F, 1.0F, 5.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(28, 0).addBox(-1.0F, -1.0F, -4.0F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 5).addBox(-1.0F, 1.0F, -3.0F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(36, 16).addBox(8.0F, -5.0F, -9.0F, 1.0F, 8.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 16).addBox(9.0F, -5.0F, -9.0F, 1.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 16).addBox(10.0F, -5.0F, -9.0F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(28, 16).addBox(11.0F, -5.0F, -9.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(32, 16).addBox(-9.0F, -5.0F, -9.0F, 1.0F, 8.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(4, 0).addBox(-10.0F, -5.0F, -9.0F, 1.0F, 6.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 0).addBox(-11.0F, -5.0F, -9.0F, 1.0F, 4.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(27, 20).addBox(-12.0F, -5.0F, -9.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 7.0F, 9.0F));
+
+        return LayerDefinition.create(meshdefinition, 64, 64);
+    }
+
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        fins.render(poseStack, buffer, packedLight, packedOverlay);
     }
 
 }

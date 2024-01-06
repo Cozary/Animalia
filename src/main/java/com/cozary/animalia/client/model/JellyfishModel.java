@@ -22,57 +22,63 @@
 package com.cozary.animalia.client.model;
 
 import com.cozary.animalia.entities.JellyfishEntity;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.entity.model.SegmentedModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
 
 import java.util.Arrays;
 
-public class JellyfishModel<T extends JellyfishEntity> extends SegmentedModel<T> {
-    private final ModelRenderer body;
-    private final ModelRenderer[] tentacle = new ModelRenderer[4];
-    private final ImmutableList<ModelRenderer> field_228296_f_;
+public class JellyfishModel<T extends JellyfishEntity> extends HierarchicalModel<T> {
+    private final ModelPart[] tentacles = new ModelPart[8];
+    private final ModelPart root;
 
-    public JellyfishModel() {
-        texWidth = 16;
-        texHeight = 16;
+    public JellyfishModel(ModelPart p_170989_) {
+        this.root = p_170989_;
+        Arrays.setAll(this.tentacles, (p_170995_) -> {
+            return p_170989_.getChild(createTentacleName(p_170995_));
+        });
+    }
 
-        body = new ModelRenderer(this, 0, 0);
-        body.y += 8.0F;
-        body.addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, 0.0F, false);
+    private static String createTentacleName(int p_170992_) {
+        return "tentacle" + p_170992_;
+    }
 
-        for (int j = 0; j < this.tentacle.length; ++j) {
-            this.tentacle[j] = new ModelRenderer(this, 8, 8);
-            double d0 = (double) j * Math.PI * 2.0D / (double) this.tentacle.length;
-            float f = (float) Math.cos(d0) * 2.5F;
-            float f1 = (float) Math.sin(d0) * 2.5F;
-            this.tentacle[j].addBox(-1.0F, 2.0F, -4.0F, 1.0F, 5.0F, 1.0F, 0.0F, false);
-            this.tentacle[j].x = f;
-            this.tentacle[j].z = f1;
-            this.tentacle[j].y = 6.0F;
-            d0 = (double) j * Math.PI * -2.0D / (double) this.tentacle.length + (Math.PI / 2D);
-            this.tentacle[j].yRot = (float) d0;
+
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(1.0F, 15.0F, 0.0F));
+        CubeListBuilder cubelistbuilder = CubeListBuilder.create().texOffs(8, 8).addBox(-1.0F, 2.0F, -4.0F, 1.0F, 5.0F, 1.0F);
+
+
+        for (int k = 0; k < 8; ++k) {
+            double d0 = (double) k * Math.PI * 2.0D / 8.0D;
+            float f = (float) Math.cos(d0) * 5.0F;
+            float f1 = 14.0F;
+            float f2 = (float) Math.sin(d0) * 5.0F;
+            d0 = (double) k * Math.PI * -2.0D / 8.0D + (Math.PI / 2D);
+            float f3 = (float) d0;
+            partdefinition.addOrReplaceChild(createTentacleName(k), cubelistbuilder, PartPose.offsetAndRotation(f + 1, f1, f2, 0.0F, f3, 0.0F));
         }
 
-        ImmutableList.Builder<ModelRenderer> builder = ImmutableList.builder();
-        builder.add(this.body);
-        builder.addAll(Arrays.asList(this.tentacle));
-        this.field_228296_f_ = builder.build();
+        return LayerDefinition.create(meshdefinition, 16, 16);
     }
 
     @Override
-    public Iterable<ModelRenderer> parts() {
-        return this.field_228296_f_;
+    public ModelPart root() {
+        return this.root;
     }
+
 
     @Override
     public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        for (ModelRenderer modelrenderer : this.tentacle) {
-            modelrenderer.xRot = ageInTicks;
+        for (ModelPart modelpart : this.tentacles) {
+            modelpart.xRot = ageInTicks / 2;
         }
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;

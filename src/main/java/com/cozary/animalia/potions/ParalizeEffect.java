@@ -21,12 +21,12 @@
 
 package com.cozary.animalia.potions;
 
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class ParalizeEffect extends Effect {
+public class ParalizeEffect extends MobEffect {
 
-    public ParalizeEffect(EffectType typeIn, int liquidColorIn) {
+    public ParalizeEffect(MobEffectCategory typeIn, int liquidColorIn) {
         super(typeIn, liquidColorIn);
     }
 

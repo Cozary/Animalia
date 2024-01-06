@@ -21,30 +21,45 @@
 
 package com.cozary.animalia.client.render.armor;
 
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.LivingEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.world.entity.LivingEntity;
 
-public class BullHatModel extends BipedModel<LivingEntity> {
+public class BullHatModel extends HumanoidModel<LivingEntity> {
 
-    public BullHatModel(float modelSize) {
-        super(modelSize, 0.0F, 64, 64);
+    private final ModelPart BullHorns;
 
-        ModelRenderer BullHorns = new ModelRenderer(this);
-        hat.addChild(BullHorns);
-        BullHorns.setPos(0.0F, 24.0F, 0.0F);
-        BullHorns.texOffs(0, 32).addBox(4.0F, -30.0F, -1.0F, 2.0F, 2.0F, 2.0F, 0.0F, false);
-        BullHorns.texOffs(0, 32).addBox(-6.0F, -30.0F, -1.0F, 2.0F, 2.0F, 2.0F, 0.0F, false);
-        BullHorns.texOffs(0, 16).addBox(6.0F, -33.0F, -1.0F, 2.0F, 5.0F, 2.0F, 0.0F, false);
-        BullHorns.texOffs(0, 16).addBox(-8.0F, -33.0F, -1.0F, 2.0F, 5.0F, 2.0F, 0.0F, false);
-        BullHorns.texOffs(24, 0).addBox(-8.0F, -33.0F, -7.0F, 2.0F, 2.0F, 6.0F, 0.0F, false);
-        BullHorns.texOffs(24, 0).addBox(6.0F, -33.0F, -7.0F, 2.0F, 2.0F, 6.0F, 0.0F, false);
+    public BullHatModel(ModelPart root) {
+        super(root);
+        this.BullHorns = root.getChild("BullHorns");
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+
+        PartDefinition BullHorns = partdefinition.addOrReplaceChild("BullHorns", CubeListBuilder.create().texOffs(0, 32).addBox(4.0F, -30.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 32).addBox(-6.0F, -30.0F, -1.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 16).addBox(6.0F, -33.0F, -1.0F, 2.0F, 5.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 16).addBox(-8.0F, -33.0F, -1.0F, 2.0F, 5.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 0).addBox(-8.0F, -33.0F, -7.0F, 2.0F, 2.0F, 6.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 0).addBox(6.0F, -33.0F, -7.0F, 2.0F, 2.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 24.0F, 0.0F));
+
+        return LayerDefinition.create(meshdefinition, 64, 64);
+    }
+
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
     }
 
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        BullHorns.render(poseStack, buffer, packedLight, packedOverlay);
+    }
 }

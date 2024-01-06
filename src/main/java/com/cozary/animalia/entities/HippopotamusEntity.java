@@ -22,27 +22,37 @@
 package com.cozary.animalia.entities;
 
 import com.cozary.animalia.init.ModSound;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
@@ -50,26 +60,25 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-
-public class HippopotamusEntity extends AnimalEntity implements IAngerable {
+public class HippopotamusEntity extends Animal implements NeutralMob {
 
     public static final Ingredient TEMPTATION_ITEMS = Ingredient.of(Items.MELON_SLICE);
-    private static final RangedInteger field_234217_by_ = TickRangeConverter.rangeOfSeconds(20, 39);
-    public static DataParameter<Boolean> AGRESSIVE = EntityDataManager.defineId(HippopotamusEntity.class, DataSerializers.BOOLEAN);
+    private static final UniformInt field_234217_by_ = TimeUtil.rangeOfSeconds(20, 39);
+    public static EntityDataAccessor<Boolean> AGRESSIVE = SynchedEntityData.defineId(HippopotamusEntity.class, EntityDataSerializers.BOOLEAN);
     public int timeUntilNextSand = 0;
     boolean done = false;
     private int field_234284_bA_;
     private UUID field_234285_bB_;
 
-    public HippopotamusEntity(EntityType<? extends AnimalEntity> type, World worldIn) {
+    public HippopotamusEntity(EntityType<? extends Animal> type, Level worldIn) {
         super(type, worldIn);
         entityData.define(AGRESSIVE, false);
-        this.setPathfindingMalus(PathNodeType.WATER, 0.0F);
-        this.setPathfindingMalus(PathNodeType.WATER_BORDER, 16.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 16.0F);
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.createMobAttributes()
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 60.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.3D)
                 .add(Attributes.FOLLOW_RANGE, 10.0D)
@@ -80,20 +89,20 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
      * Uses for Spawn
      */
 
-    public static boolean canHippopotamusSpawn(EntityType<? extends HippopotamusEntity> entityType, IWorld world, SpawnReason spawnReason, BlockPos pos, Random random) {
+    public static boolean canHippopotamusSpawn(EntityType<? extends HippopotamusEntity> entityType, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, Random random) {
         return world.getBlockState(pos.below()).is(Blocks.SAND) && world.getLightEmission(pos) > 8 && world.canSeeSky(pos);
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(5, new SwimGoal(this));
-        this.goalSelector.addGoal(1, new RandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(2, new TemptGoal(this, 1.0D, false, TEMPTATION_ITEMS));
-        this.goalSelector.addGoal(4, new LookAtGoal(this, PlayerEntity.class, 20.0F));
+        this.goalSelector.addGoal(5, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new RandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(2, new TemptGoal(this, 1.0D, TEMPTATION_ITEMS, false));
+        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 20.0F));
         this.goalSelector.addGoal(0, new MeleeHipo());
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(1, new ResetAngerGoal<>(this, false));
+        this.targetSelector.addGoal(1, new ResetUniversalAngerTargetGoal<>(this, false));
         this.targetSelector.addGoal(0, new AttackPlayerGoal());
 
     }
@@ -127,15 +136,22 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
 
     @Override
     public void startPersistentAngerTimer() {
-        this.setRemainingPersistentAngerTime(field_234217_by_.randomValue(this.random));
+        this.setRemainingPersistentAngerTime(field_234217_by_.sample(this.random));
 
     }
 
 
+    @Nullable
     @Override
-    public void addAdditionalSaveData(CompoundNBT compound) {
+    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
+        return null;
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         this.addPersistentAngerSaveData(compound);
+        compound.putInt("EggLayTime", this.timeUntilNextSand);
     }
 
     public boolean canBreatheUnderwater() {
@@ -155,8 +171,17 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
     }
 
     @Override
-    public void aiStep() {
-        super.aiStep();
+    public void readAdditionalSaveData(CompoundTag p_28243_) {
+        super.readAdditionalSaveData(p_28243_);
+        if (p_28243_.contains("EggLayTime")) {
+            this.timeUntilNextSand = p_28243_.getInt("EggLayTime");
+        }
+
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
         if (!level.isClientSide) {
             if (isAgressiveL() && !entityData.get(AGRESSIVE)) {
                 entityData.set(AGRESSIVE, true);
@@ -173,7 +198,7 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
 
 
     @Override
-    public ActionResultType mobInteract(PlayerEntity player, Hand handItem) {
+    public InteractionResult mobInteract(Player player, InteractionHand handItem) {
         ItemStack itemstack = player.getItemInHand(handItem);
         if (itemstack.getItem() == Items.WOODEN_SHOVEL || itemstack.getItem() == Items.DIAMOND_SHOVEL || itemstack.getItem() == Items.GOLDEN_SHOVEL || itemstack.getItem() == Items.IRON_SHOVEL || itemstack.getItem() == Items.NETHERITE_SHOVEL || itemstack.getItem() == Items.STONE_SHOVEL && --this.timeUntilNextSand <= 0) {
             if (!this.level.isClientSide && done) {
@@ -185,10 +210,10 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
                     this.spawnAtLocation(Items.SAND, 1);
                     done = false;
                 }
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             } else {
-                //this.timeUntilNextSand = this.rand.nextInt(200) + 200;
-                return ActionResultType.CONSUME;
+                this.timeUntilNextSand = this.random.nextInt(200) + 200;
+                return InteractionResult.CONSUME;
             }
         } else {
             return super.mobInteract(player, handItem);
@@ -196,7 +221,7 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
     }
 
     @Override
-    protected int getExperienceReward(PlayerEntity player) {
+    protected int getExperienceReward(Player player) {
         return 2 + this.level.random.nextInt(4);
     }
 
@@ -225,18 +250,12 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
     }
 
 
-    public boolean canBeLeashedTo(PlayerEntity player) {
+    public boolean canBeLeashedTo(Player player) {
         return false;
     }
 
-    @Nullable
-    @Override
-    public AgeableEntity getBreedOffspring(ServerWorld p_241840_1_, AgeableEntity p_241840_2_) {
-        return null;
-    }
 
-
-    class MeleeHipo extends MeleeAttackGoal {
+    class MeleeHipo extends net.minecraft.world.entity.ai.goal.MeleeAttackGoal {
 
         public MeleeHipo() {
             super(HippopotamusEntity.this, 2D, true);
@@ -245,7 +264,7 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
 
         @Override
         protected void checkAndPerformAttack(LivingEntity enemy, double distToEnemySqr) {
-            HippopotamusEntity.this.setItemInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+            HippopotamusEntity.this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             double d0 = this.getAttackReachSqr(enemy);
             if (distToEnemySqr <= d0) {
                 this.resetAttackCooldown();
@@ -282,7 +301,7 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
     }
 
     class AttackPlayerGoal extends Goal {
-        private final EntityPredicate field_220842_b = (new EntityPredicate()).range(5.0D);
+        private final TargetingConditions field_220842_b = (TargetingConditions.DEFAULT).range(5.0D);
         private int tickDelay = 60;
 
         private AttackPlayerGoal() {
@@ -298,12 +317,12 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
                 return false;
             } else {
                 this.tickDelay = 60;
-                List<PlayerEntity> list = HippopotamusEntity.this.level.getNearbyPlayers(this.field_220842_b, HippopotamusEntity.this, HippopotamusEntity.this.getBoundingBox().inflate(5.0D, 5.0D, 5.0D));
+                List<Player> list = HippopotamusEntity.this.level.getNearbyPlayers(this.field_220842_b, HippopotamusEntity.this, HippopotamusEntity.this.getBoundingBox().inflate(5.0D, 5.0D, 5.0D));
                 if (!list.isEmpty()) {
                     list.sort(Comparator.comparing(Entity::getEyeY).reversed());
 
-                    for (PlayerEntity playerentity : list) {
-                        if (HippopotamusEntity.this.canAttack(playerentity, EntityPredicate.DEFAULT) && !HippopotamusEntity.this.isBaby()) {
+                    for (Player playerentity : list) {
+                        if (HippopotamusEntity.this.canAttack(playerentity, TargetingConditions.DEFAULT) && !HippopotamusEntity.this.isBaby()) {
                             HippopotamusEntity.this.setTarget(playerentity);
                             return true;
                         }
@@ -319,7 +338,7 @@ public class HippopotamusEntity extends AnimalEntity implements IAngerable {
          */
         public boolean canContinueToUse() {
             LivingEntity livingentity = HippopotamusEntity.this.getTarget();
-            return livingentity != null && HippopotamusEntity.this.canAttack(livingentity, EntityPredicate.DEFAULT);
+            return livingentity != null && HippopotamusEntity.this.canAttack(livingentity, TargetingConditions.DEFAULT);
         }
     }
 

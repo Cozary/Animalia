@@ -21,19 +21,19 @@
 
 package com.cozary.animalia.biomesPLS;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 public class DataUtil {
     public DataUtil() {
     }
 
-    public static boolean matchesKeys(ResourceLocation loc, RegistryKey<?>... keys) {
-        RegistryKey[] var2 = keys;
+    public static boolean matchesKeys(ResourceLocation loc, ResourceKey<?>... keys) {
+        ResourceKey[] var2 = keys;
         int var3 = keys.length;
 
         for (int var4 = 0; var4 < var3; ++var4) {
-            RegistryKey<?> key = var2[var4];
+            ResourceKey<?> key = var2[var4];
             if (key.location().equals(loc)) {
                 return true;
             }

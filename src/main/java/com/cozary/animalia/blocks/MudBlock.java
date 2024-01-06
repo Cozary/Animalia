@@ -21,19 +21,28 @@
 
 package com.cozary.animalia.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.WebBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.Vec3;
 
-public class MudBlock extends Block {
+public class MudBlock extends WebBlock {
     public MudBlock() {
-        super(Properties.of(Material.CLAY)
+        super(Block.Properties.of(Material.CLAY)
                 .strength(1.8f, 2.0f)
                 .sound(SoundType.WET_GRASS)
-                .harvestLevel(1)
-                .harvestTool(ToolType.SHOVEL)
+                .noCollission()
                 .requiresCorrectToolForDrops()
         );
+    }
+
+    @Override
+    public void entityInside(BlockState p_58180_, Level p_58181_, BlockPos p_58182_, Entity p_58183_) {
+        p_58183_.makeStuckInBlock(p_58180_, new Vec3(0.25D, 0.05F, 0.25D));
     }
 }

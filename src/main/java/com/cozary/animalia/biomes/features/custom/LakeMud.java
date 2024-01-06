@@ -22,21 +22,21 @@
 package com.cozary.animalia.biomes.features.custom;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.feature.WorldDecoratingHelper;
-import net.minecraft.world.gen.placement.ChanceConfig;
-import net.minecraft.world.gen.placement.Placement;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
+import net.minecraft.world.level.levelgen.placement.DecorationContext;
+import net.minecraft.world.level.levelgen.placement.FeatureDecorator;
 
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class LakeMud extends Placement<ChanceConfig> {
-    public LakeMud(Codec<ChanceConfig> codec) {
+public class LakeMud extends FeatureDecorator<ChanceDecoratorConfiguration> {
+    public LakeMud(Codec<ChanceDecoratorConfiguration> codec) {
         super(codec);
     }
 
     @Override
-    public Stream<BlockPos> getPositions(WorldDecoratingHelper helper, Random rand, ChanceConfig chanceConfig, BlockPos pos) {
+    public Stream<BlockPos> getPositions(DecorationContext helper, Random rand, ChanceDecoratorConfiguration chanceConfig, BlockPos pos) {
         if (rand.nextInt(100) < 50) {
             int x = rand.nextInt(16) + pos.getX();
             int z = rand.nextInt(16) + pos.getZ();

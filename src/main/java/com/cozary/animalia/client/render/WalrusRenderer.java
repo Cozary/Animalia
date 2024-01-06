@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.WalrusModel;
 import com.cozary.animalia.entities.WalrusEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class WalrusRenderer extends MobRenderer<WalrusEntity, WalrusModel<WalrusEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/walrus.png");
 
-    public WalrusRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new WalrusModel<>(), 0.7F);
+    public WalrusRenderer(EntityRendererProvider.Context context) {
+        super(context, new WalrusModel<>(context.bakeLayer(ClientEventBusSubscriber.WALRUS)), 0.5F);
     }
 
     @Override

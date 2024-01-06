@@ -23,91 +23,104 @@ package com.cozary.animalia.client.model;
 
 import com.cozary.animalia.entities.VultureEntity;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.entity.model.AgeableModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.util.Mth;
 
-public class VultureModel<T extends VultureEntity> extends AgeableModel<T> {
-    private final ModelRenderer body;
-    private final ModelRenderer wingLeft;
-    private final ModelRenderer wingRight;
-    private final ModelRenderer head;
-    private final ModelRenderer legLeft;
-    private final ModelRenderer legRight;
+public class VultureModel<T extends VultureEntity> extends AgeableListModel<T> {
+    private final ModelPart body;
+    private final ModelPart wingLeft;
+    private final ModelPart wingRight;
+    private final ModelPart head;
+    private final ModelPart legLeft;
+    private final ModelPart legRight;
 
-    public VultureModel() {
-        texWidth = 64;
-        texHeight = 64;
+    public VultureModel(ModelPart root) {
+        this.body = root.getChild("body");
+        this.wingLeft = root.getChild("wingLeft");
+        this.wingRight = root.getChild("wingRight");
+        this.head = root.getChild("head");
+        this.legLeft = root.getChild("legLeft");
+        this.legRight = root.getChild("legRight");
+    }
 
-        body = new ModelRenderer(this);
-        body.setPos(0.0F, 15.0F, 0.0F);
-        body.texOffs(0, 0).addBox(-4.0F, -1.0F, -6.0F, 8.0F, 4.0F, 12.0F, 0.0F, false);
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
 
-        wingLeft = new ModelRenderer(this);
-        wingLeft.setPos(4.0F, 15.0F, 0.0F);
-        wingLeft.texOffs(0, 16).addBox(0.0F, -1.0F, -4.0F, 9.0F, 1.0F, 4.0F, 0.0F, false);
-        wingLeft.texOffs(22, 18).addBox(0.0F, -1.0F, -5.0F, 8.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(22, 16).addBox(0.0F, -1.0F, 0.0F, 8.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(0, 28).addBox(0.0F, -1.0F, 1.0F, 7.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(28, 2).addBox(0.0F, -1.0F, 2.0F, 6.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(0, 0).addBox(0.0F, -1.0F, 3.0F, 5.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(28, 10).addBox(0.0F, -1.0F, 4.0F, 4.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -1.0F, -6.0F, 8.0F, 4.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 15.0F, 0.0F));
 
-        wingRight = new ModelRenderer(this);
-        wingRight.setPos(-4.0F, 15.0F, 0.0F);
-        wingRight.texOffs(0, 21).addBox(-9.0F, -1.0F, -4.0F, 9.0F, 1.0F, 4.0F, 0.0F, false);
-        wingRight.texOffs(0, 26).addBox(-8.0F, -1.0F, -5.0F, 8.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(22, 21).addBox(-8.0F, -1.0F, 0.0F, 8.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(28, 0).addBox(-7.0F, -1.0F, 1.0F, 7.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(28, 4).addBox(-6.0F, -1.0F, 2.0F, 6.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(0, 2).addBox(-5.0F, -1.0F, 3.0F, 5.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(5, 30).addBox(-4.0F, -1.0F, 4.0F, 4.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition wingLeft = partdefinition.addOrReplaceChild("wingLeft", CubeListBuilder.create().texOffs(0, 16).addBox(0.0F, -1.0F, -4.0F, 9.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+                .texOffs(22, 18).addBox(0.0F, -1.0F, -5.0F, 8.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(22, 16).addBox(0.0F, -1.0F, 0.0F, 8.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 28).addBox(0.0F, -1.0F, 1.0F, 7.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(28, 2).addBox(0.0F, -1.0F, 2.0F, 6.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 0).addBox(0.0F, -1.0F, 3.0F, 5.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(28, 10).addBox(0.0F, -1.0F, 4.0F, 4.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(4.0F, 15.0F, 0.0F));
 
-        head = new ModelRenderer(this);
-        head.setPos(0.0F, 15.0F, -6.0F);
-        head.texOffs(23, 23).addBox(-2.0F, -3.0F, -8.0F, 4.0F, 4.0F, 3.0F, 0.0F, false);
-        head.texOffs(15, 27).addBox(-1.0F, -1.0F, -3.0F, 2.0F, 1.0F, 3.0F, 0.0F, false);
-        head.texOffs(0, 8).addBox(-1.0F, 1.0F, -6.0F, 2.0F, 1.0F, 3.0F, 0.0F, false);
-        head.texOffs(0, 4).addBox(-1.0F, 0.0F, -11.0F, 2.0F, 1.0F, 3.0F, 0.0F, false);
-        head.texOffs(24, 30).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 1.0F, 0.0F, false);
-        head.texOffs(30, 30).addBox(-1.0F, 1.0F, -11.0F, 2.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition wingRight = partdefinition.addOrReplaceChild("wingRight", CubeListBuilder.create().texOffs(0, 21).addBox(-9.0F, -1.0F, -4.0F, 9.0F, 1.0F, 4.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 26).addBox(-8.0F, -1.0F, -5.0F, 8.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(22, 21).addBox(-8.0F, -1.0F, 0.0F, 8.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(28, 0).addBox(-7.0F, -1.0F, 1.0F, 7.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(28, 4).addBox(-6.0F, -1.0F, 2.0F, 6.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 2).addBox(-5.0F, -1.0F, 3.0F, 5.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(5, 30).addBox(-4.0F, -1.0F, 4.0F, 4.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-4.0F, 15.0F, 0.0F));
 
-        legLeft = new ModelRenderer(this);
-        legLeft.setPos(2.0F, 18.0F, 0.0F);
-        legLeft.texOffs(0, 30).addBox(0.0F, 2.0F, 1.0F, 1.0F, 1.0F, 3.0F, 0.0F, false);
-        legLeft.texOffs(0, 21).addBox(0.0F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, 0.0F, false);
-        legLeft.texOffs(7, 8).addBox(0.0F, 3.0F, 3.0F, 1.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(23, 23).addBox(-2.0F, -3.0F, -8.0F, 4.0F, 4.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(15, 27).addBox(-1.0F, -1.0F, -3.0F, 2.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 8).addBox(-1.0F, 1.0F, -6.0F, 2.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 4).addBox(-1.0F, 0.0F, -11.0F, 2.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(24, 30).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(30, 30).addBox(-1.0F, 1.0F, -11.0F, 2.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 15.0F, -6.0F));
 
-        legRight = new ModelRenderer(this);
-        legRight.setPos(-2.0F, 18.0F, 0.0F);
-        legRight.texOffs(28, 6).addBox(-1.0F, 2.0F, 1.0F, 1.0F, 1.0F, 3.0F, 0.0F, false);
-        legRight.texOffs(0, 16).addBox(-1.0F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, 0.0F, false);
-        legRight.texOffs(7, 4).addBox(-1.0F, 3.0F, 3.0F, 1.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition legLeft = partdefinition.addOrReplaceChild("legLeft", CubeListBuilder.create().texOffs(0, 30).addBox(0.0F, 2.0F, 1.0F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 21).addBox(0.0F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(7, 8).addBox(0.0F, 3.0F, 3.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, 18.0F, 0.0F));
+
+        PartDefinition legRight = partdefinition.addOrReplaceChild("legRight", CubeListBuilder.create().texOffs(28, 6).addBox(-1.0F, 2.0F, 1.0F, 1.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 16).addBox(-1.0F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(7, 4).addBox(-1.0F, 3.0F, 3.0F, 1.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, 18.0F, 0.0F));
+
+        return LayerDefinition.create(meshdefinition, 64, 64);
     }
 
     @Override
     public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.head.xRot = headPitch * ((float) Math.PI / 180F);
         this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.wingRight.zRot = MathHelper.sin(ageInTicks * 0.7F) * 0.5F;
+        this.wingRight.zRot = Mth.sin(ageInTicks * 0.7F) * 0.5F;
         this.wingLeft.zRot = -this.wingRight.zRot;
-        this.legRight.yRot = MathHelper.sin(ageInTicks * 0.2F) * 0.2F;
+        this.legRight.yRot = Mth.sin(ageInTicks * 0.2F) * 0.2F;
         this.legLeft.yRot = -this.legRight.yRot;
     }
 
     @Override
-    protected Iterable<ModelRenderer> headParts() {
+    protected Iterable<ModelPart> headParts() {
         return ImmutableList.of(this.head);
     }
 
     @Override
-    protected Iterable<ModelRenderer> bodyParts() {
+    protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(this.body, this.wingLeft, this.wingRight, this.legLeft, this.legRight);
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        body.render(poseStack, buffer, packedLight, packedOverlay);
+        wingLeft.render(poseStack, buffer, packedLight, packedOverlay);
+        wingRight.render(poseStack, buffer, packedLight, packedOverlay);
+        head.render(poseStack, buffer, packedLight, packedOverlay);
+        legLeft.render(poseStack, buffer, packedLight, packedOverlay);
+        legRight.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

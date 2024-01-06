@@ -24,69 +24,71 @@ package com.cozary.animalia.biomesPLS;
 import com.cozary.animalia.biomes.core.registry.ModFeatures;
 import com.cozary.animalia.biomes.features.custom.MudLakeFeature;
 import com.cozary.animalia.biomes.features.custom.WaterSpringExtraFeature;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.biome.*;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.structure.StructureFeatures;
-import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
-import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
-import net.minecraft.world.gen.surfacebuilders.ISurfaceBuilderConfig;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.data.worldgen.SurfaceBuilders;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
+import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderConfiguration;
 
 public class BiomeBuilder {
 
     public static Biome makeMuddySwamp(float depth, float scale) {
-        MobSpawnInfo.Builder spawn = new MobSpawnInfo.Builder()
+        MobSpawnSettings.Builder spawn = new MobSpawnSettings.Builder()
                 .setPlayerCanSpawn()
-                .addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.SLIME, 1, 1, 1));
+                .addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.SLIME, 1, 1, 1));
 
-        BiomeAmbience.Builder ambience = new BiomeAmbience.Builder()
+        BiomeSpecialEffects.Builder ambience = new BiomeSpecialEffects.Builder()
                 .waterColor(8610623)
                 .waterFogColor(10779727)
                 .fogColor(15128208)
                 .skyColor(getSkyColorFromTemp(0.75F))
-                .ambientMoodSound(MoodSoundAmbience.LEGACY_CAVE_SETTINGS)
+                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
                 .foliageColorOverride(8421376)
                 .grassColorOverride(5994060);
 
         BiomeGenerationSettings.Builder settings = new BiomeGenerationSettings.Builder()
-                .surfaceBuilder(ConfiguredSurfaceBuilders.SWAMP)
+                .surfaceBuilder(SurfaceBuilders.SWAMP)
                 .addStructureStart(StructureFeatures.RUINED_PORTAL_SWAMP)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.SEAGRASS_SWAMP)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.FLOWER_SWAMP)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_WATERLILLY)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.BROWN_MUSHROOM_SWAMP)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.RED_MUSHROOM_SWAMP)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, ModFeatures.Configured.MORE_BLUE_ORCHID)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, MudLakeFeature.MUD_LAKES);
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.SEAGRASS_SWAMP)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.FLOWER_SWAMP)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.PATCH_WATERLILLY)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.BROWN_MUSHROOM_SWAMP)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.RED_MUSHROOM_SWAMP)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModFeatures.Configured.MORE_BLUE_ORCHID)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, MudLakeFeature.MUD_LAKES);
 
-        DefaultBiomeFeatures.addDefaultOverworldLandStructures(settings);
-        DefaultBiomeFeatures.addDefaultCarvers(settings);
-        DefaultBiomeFeatures.addDefaultLakes(settings);
-        DefaultBiomeFeatures.addDefaultMonsterRoom(settings);
-        DefaultBiomeFeatures.addDefaultUndergroundVariety(settings);
-        DefaultBiomeFeatures.addDefaultOres(settings);
-        DefaultBiomeFeatures.addDefaultSoftDisks(settings);
-        DefaultBiomeFeatures.addDefaultMushrooms(settings);
-        DefaultBiomeFeatures.addSwampExtraVegetation(settings);
-        DefaultBiomeFeatures.addDefaultSprings(settings);
-        DefaultBiomeFeatures.addSurfaceFreezing(settings);
-        DefaultBiomeFeatures.addSwampVegetation(settings);
+        BiomeDefaultFeatures.addDefaultOverworldLandStructures(settings);
+        BiomeDefaultFeatures.addDefaultCarvers(settings);
+        BiomeDefaultFeatures.addDefaultLakes(settings);
+        BiomeDefaultFeatures.addDefaultMonsterRoom(settings);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(settings);
+        BiomeDefaultFeatures.addDefaultOres(settings);
+        BiomeDefaultFeatures.addDefaultSoftDisks(settings);
+        BiomeDefaultFeatures.addDefaultMushrooms(settings);
+        BiomeDefaultFeatures.addSwampExtraVegetation(settings);
+        BiomeDefaultFeatures.addDefaultSprings(settings);
+        BiomeDefaultFeatures.addSurfaceFreezing(settings);
+        BiomeDefaultFeatures.addSwampVegetation(settings);
+        BiomeDefaultFeatures.addDefaultCrystalFormations(settings);
 
-        Biome.Builder builder = new Biome.Builder()
+        Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
                 .scale(scale)
                 .temperature(0.8F)
-                .biomeCategory(Biome.Category.SWAMP)
-                .precipitation(Biome.RainType.RAIN)
+                .biomeCategory(Biome.BiomeCategory.SWAMP)
+                .precipitation(Biome.Precipitation.RAIN)
                 .downfall(0.4F)
                 .depth(depth)
                 .mobSpawnSettings(spawn.build())
                 .specialEffects(ambience.build())
                 .generationSettings((new BiomeGenerationSettings.Builder())
-                        .surfaceBuilder(ConfiguredSurfaceBuilders.SWAMP)
+                        .surfaceBuilder(SurfaceBuilders.SWAMP)
                         .build());
         //.generationSettings(settings.build());
 
@@ -94,50 +96,52 @@ public class BiomeBuilder {
     }
 
     public static Biome makeDesertLakes() {
-        MobSpawnInfo.Builder spawn = new MobSpawnInfo.Builder()
-                .addSpawn(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(EntityType.RABBIT, 4, 2, 3))
-                .addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.HUSK, 80, 4, 4));
+        MobSpawnSettings.Builder spawn = new MobSpawnSettings.Builder()
+                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 4, 2, 3))
+                .addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(EntityType.HUSK, 80, 4, 4));
 
-        BiomeAmbience.Builder ambience = new BiomeAmbience.Builder()
+        BiomeSpecialEffects.Builder ambience = new BiomeSpecialEffects.Builder()
                 .waterColor(0x05bdf2)
                 .waterFogColor(0x38a3c2)
                 .fogColor(0xa5e7ff)
                 .skyColor(getSkyColorFromTemp(2F))
-                .ambientMoodSound(MoodSoundAmbience.LEGACY_CAVE_SETTINGS)
+                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
                 .foliageColorOverride(8421376)
                 .grassColorOverride(5994060);
 
         BiomeGenerationSettings.Builder settings = new BiomeGenerationSettings.Builder()
-                .surfaceBuilder(ConfiguredSurfaceBuilders.DESERT)
-                .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, WaterSpringExtraFeature.WATER_SPRING_EXTRA);
+                .surfaceBuilder(SurfaceBuilders.DESERT)
+                .addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, WaterSpringExtraFeature.WATER_SPRING_EXTRA);
 
 
-        DefaultBiomeFeatures.addDefaultOverworldLandStructures(settings);
-        DefaultBiomeFeatures.addDefaultMonsterRoom(settings);
-        DefaultBiomeFeatures.addDefaultUndergroundVariety(settings);
-        DefaultBiomeFeatures.addDefaultOres(settings);
-        DefaultBiomeFeatures.addDefaultSoftDisks(settings);
-        DefaultBiomeFeatures.addDefaultCarvers(settings);
-        DefaultBiomeFeatures.addFossilDecoration(settings);
-        DefaultBiomeFeatures.addDefaultFlowers(settings);
-        DefaultBiomeFeatures.addBadlandGrass(settings);
-        DefaultBiomeFeatures.addDesertVegetation(settings);
-        DefaultBiomeFeatures.addDefaultMushrooms(settings);
-        DefaultBiomeFeatures.addDesertExtraVegetation(settings);
-        DefaultBiomeFeatures.addDesertExtraDecoration(settings);
-        DefaultBiomeFeatures.addSurfaceFreezing(settings);
+        BiomeDefaultFeatures.addDefaultOverworldLandStructures(settings);
+        BiomeDefaultFeatures.addDefaultMonsterRoom(settings);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(settings);
+        BiomeDefaultFeatures.addDefaultOres(settings);
+        BiomeDefaultFeatures.addDefaultSoftDisks(settings);
+        BiomeDefaultFeatures.addDefaultCarvers(settings);
+        BiomeDefaultFeatures.addFossilDecoration(settings);
+        BiomeDefaultFeatures.addDefaultFlowers(settings);
+        BiomeDefaultFeatures.addDefaultGrass(settings);
+        BiomeDefaultFeatures.addDesertVegetation(settings);
+        BiomeDefaultFeatures.addDefaultMushrooms(settings);
+        BiomeDefaultFeatures.addDesertExtraVegetation(settings);
+        BiomeDefaultFeatures.addDesertExtraDecoration(settings);
+        BiomeDefaultFeatures.addSurfaceFreezing(settings);
+        BiomeDefaultFeatures.addDefaultCrystalFormations(settings);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(settings);
 
-        Biome.Builder builder = new Biome.Builder()
+        Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
                 .scale(0.05F)
                 .temperature(1.9F)
-                .biomeCategory(Biome.Category.DESERT)
-                .precipitation(Biome.RainType.NONE)
+                .biomeCategory(Biome.BiomeCategory.DESERT)
+                .precipitation(Biome.Precipitation.NONE)
                 .downfall(0.0f)
                 .depth(-0.125F)
                 .mobSpawnSettings(spawn.build())
                 .specialEffects(ambience.build())
                 .generationSettings((new BiomeGenerationSettings.Builder())
-                        .surfaceBuilder(ConfiguredSurfaceBuilders.DESERT)
+                        .surfaceBuilder(SurfaceBuilders.DESERT)
                         .build());
         //.generationSettings(settings.build());
 
@@ -147,11 +151,11 @@ public class BiomeBuilder {
 
     private static int getSkyColorFromTemp(float temp) {
         float i = temp / 3.0F;
-        i = MathHelper.clamp(i, -1.0F, 1.0F);
-        return MathHelper.hsvToRgb(0.62222224F - i * 0.05F, 0.5F + i * 0.1F, 1.0F);
+        i = Mth.clamp(i, -1.0F, 1.0F);
+        return Mth.hsvToRgb(0.62222224F - i * 0.05F, 0.5F + i * 0.1F, 1.0F);
     }
 
-    private static <SC extends ISurfaceBuilderConfig> ConfiguredSurfaceBuilder<SC> makeSurfaceBuilder(String p_244192_0_, ConfiguredSurfaceBuilder<SC> p_244192_1_) {
-        return WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_SURFACE_BUILDER, p_244192_0_, p_244192_1_);
+    private static <SC extends SurfaceBuilderConfiguration> ConfiguredSurfaceBuilder<SC> makeSurfaceBuilder(String p_244192_0_, ConfiguredSurfaceBuilder<SC> p_244192_1_) {
+        return BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_SURFACE_BUILDER, p_244192_0_, p_244192_1_);
     }
 }

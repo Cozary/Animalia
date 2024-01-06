@@ -21,7 +21,7 @@
 
 package com.cozary.animalia.items;
 
-import net.minecraft.item.TridentItem;
+import net.minecraft.world.item.TridentItem;
 
 public class CustomTrident extends TridentItem {
 

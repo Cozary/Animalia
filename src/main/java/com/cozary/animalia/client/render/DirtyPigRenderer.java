@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.DirtyPigModel;
 import com.cozary.animalia.entities.DirtyPigEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class DirtyPigRenderer extends MobRenderer<DirtyPigEntity, DirtyPigModel<DirtyPigEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/dirty_pig.png");
 
-    public DirtyPigRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new DirtyPigModel<>(), 0.7F);
+    public DirtyPigRenderer(EntityRendererProvider.Context context) {
+        super(context, new DirtyPigModel<>(context.bakeLayer(ClientEventBusSubscriber.DIRTY_PIG)), 0.5F);
     }
 
     @Override

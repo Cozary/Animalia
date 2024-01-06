@@ -23,32 +23,38 @@ package com.cozary.animalia.client.model;
 
 import com.cozary.animalia.entities.SnailEntity;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.entity.model.AgeableModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
 
-public class SnailModel<T extends SnailEntity> extends AgeableModel<T> {
-    private final ModelRenderer body;
-    private final ModelRenderer head;
-    private final ModelRenderer tail;
+public class SnailModel<T extends SnailEntity> extends AgeableListModel<T> {
+    private final ModelPart body;
+    private final ModelPart head;
+    private final ModelPart tail;
 
-    public SnailModel() {
-        texWidth = 32;
-        texHeight = 32;
+    public SnailModel(ModelPart root) {
+        this.body = root.getChild("body");
+        this.head = root.getChild("head");
+        this.tail = root.getChild("tail");
+    }
 
-        body = new ModelRenderer(this);
-        body.setPos(0.0F, 20.0F, 1.0F);
-        body.texOffs(0, 0).addBox(-4.0F, -4.0F, -4.0F, 8.0F, 8.0F, 8.0F, 0.0F, false);
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
 
-        head = new ModelRenderer(this);
-        head.setPos(0.0F, 23.0F, -3.0F);
-        head.texOffs(14, 16).addBox(-2.0F, -1.0F, -3.0F, 4.0F, 2.0F, 3.0F, 0.0F, false);
-        head.texOffs(0, 16).addBox(-2.0F, -6.0F, -6.0F, 4.0F, 7.0F, 3.0F, 0.0F, false);
-        head.texOffs(0, 3).addBox(-3.0F, -8.0F, -5.0F, 1.0F, 2.0F, 1.0F, 0.0F, false);
-        head.texOffs(0, 0).addBox(2.0F, -8.0F, -5.0F, 1.0F, 2.0F, 1.0F, 0.0F, false);
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -4.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 20.0F, 1.0F));
 
-        tail = new ModelRenderer(this);
-        tail.setPos(0.0F, 23.0F, 5.0F);
-        tail.texOffs(14, 21).addBox(-2.0F, -1.0F, 0.0F, 4.0F, 2.0F, 3.0F, 0.0F, false);
+        PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(14, 16).addBox(-2.0F, -1.0F, -3.0F, 4.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 16).addBox(-2.0F, -6.0F, -6.0F, 4.0F, 7.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 3).addBox(-3.0F, -8.0F, -5.0F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 0).addBox(2.0F, -8.0F, -5.0F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 23.0F, -3.0F));
+
+        PartDefinition tail = partdefinition.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(14, 21).addBox(-2.0F, -1.0F, 0.0F, 4.0F, 2.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 23.0F, 5.0F));
+
+        return LayerDefinition.create(meshdefinition, 32, 32);
     }
 
     @Override
@@ -64,18 +70,25 @@ public class SnailModel<T extends SnailEntity> extends AgeableModel<T> {
     }
 
     @Override
-    protected Iterable<ModelRenderer> headParts() {
+    protected Iterable<ModelPart> headParts() {
         return ImmutableList.of(this.head);
     }
 
     @Override
-    protected Iterable<ModelRenderer> bodyParts() {
+    protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(this.body, this.tail);
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        body.render(poseStack, buffer, packedLight, packedOverlay);
+        head.render(poseStack, buffer, packedLight, packedOverlay);
+        tail.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

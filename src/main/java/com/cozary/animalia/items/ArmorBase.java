@@ -21,65 +21,52 @@
 
 package com.cozary.animalia.items;
 
-import com.cozary.animalia.Animalia;
 import com.cozary.animalia.init.ModItems;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.IArmorMaterial;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ArmorBase {
 
     public static class ShellArmor extends ArmorItem {
 
-        public ShellArmor(IArmorMaterial materialIn, EquipmentSlotType slot, Properties p_i48534_3_) {
+        public ShellArmor(ArmorMaterial materialIn, EquipmentSlot slot, Properties p_i48534_3_) {
             super(materialIn, slot, p_i48534_3_);
         }
 
         @Override
-        public void onArmorTick(ItemStack itemStack, World world, PlayerEntity player) {
-            ItemStack head = player.getItemBySlot(EquipmentSlotType.CHEST);
+        public void onArmorTick(ItemStack itemStack, Level world, Player player) {
+            ItemStack head = player.getItemBySlot(EquipmentSlot.CHEST);
             if (head.getItem() == ModItems.SHELL_ARMOR.get()) {
-                if (!player.hasEffect(Effect.byId(11))) {
-                    EffectInstance statusEffect = new EffectInstance(Effects.DAMAGE_RESISTANCE, 100, 1);
+                if (!player.hasEffect(MobEffect.byId(11))) {
+                    MobEffectInstance statusEffect = new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 1);
                     player.addEffect(statusEffect);
                 }
             }
-        }
-
-        @Override
-        public <A extends BipedModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, A _default) {
-            return Animalia.PROXY.getShellModel(armorSlot);
         }
 
     }
 
     public static class BearArmor extends ArmorItem {
 
-        public BearArmor(IArmorMaterial materialIn, EquipmentSlotType slot, Properties p_i48534_3_) {
+        public BearArmor(ArmorMaterial materialIn, EquipmentSlot slot, Properties p_i48534_3_) {
             super(materialIn, slot, p_i48534_3_);
         }
 
         @Override
-        public <A extends BipedModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, A _default) {
-            return Animalia.PROXY.getBearHatModel(armorSlot);
-        }
-
-        @Override
-        public void onArmorTick(ItemStack itemStack, World world, PlayerEntity player) {
-            ItemStack head = player.getItemBySlot(EquipmentSlotType.HEAD);
+        public void onArmorTick(ItemStack itemStack, Level world, Player player) {
+            ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
             if (head.getItem() == ModItems.BEAR_ARMOR.get()) {
-                if (!player.hasEffect(Effect.byId(10)) && !player.hasEffect(Effect.byId(1))) {
-                    EffectInstance statusEffect = new EffectInstance(Effects.REGENERATION, 100, 0);
-                    EffectInstance statusEffect2 = new EffectInstance(Effects.MOVEMENT_SPEED, 100, 0);
+                if (!player.hasEffect(MobEffect.byId(10)) && !player.hasEffect(MobEffect.byId(1))) {
+                    MobEffectInstance statusEffect = new MobEffectInstance(MobEffects.REGENERATION, 100, 0);
+                    MobEffectInstance statusEffect2 = new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 0);
                     player.addEffect(statusEffect);
                     player.addEffect(statusEffect2);
                 }
@@ -89,21 +76,16 @@ public class ArmorBase {
 
     public static class BullArmor extends ArmorItem {
 
-        public BullArmor(IArmorMaterial materialIn, EquipmentSlotType slot, Properties p_i48534_3_) {
+        public BullArmor(ArmorMaterial materialIn, EquipmentSlot slot, Properties p_i48534_3_) {
             super(materialIn, slot, p_i48534_3_);
         }
 
         @Override
-        public <A extends BipedModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, A _default) {
-            return Animalia.PROXY.getBullHatModel(armorSlot);
-        }
-
-        @Override
-        public void onArmorTick(ItemStack itemStack, World world, PlayerEntity player) {
-            ItemStack head = player.getItemBySlot(EquipmentSlotType.HEAD);
+        public void onArmorTick(ItemStack itemStack, Level world, Player player) {
+            ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
             if (head.getItem() == ModItems.BULL_HAT.get()) {
-                if (!player.hasEffect(Effect.byId(5))) {
-                    EffectInstance statusEffect = new EffectInstance(Effects.DAMAGE_BOOST, 100, 0);
+                if (!player.hasEffect(MobEffect.byId(5))) {
+                    MobEffectInstance statusEffect = new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 0);
                     player.addEffect(statusEffect);
                 }
             }
@@ -113,21 +95,16 @@ public class ArmorBase {
 
     public static class FinsArmor extends ArmorItem {
 
-        public FinsArmor(IArmorMaterial materialIn, EquipmentSlotType slot, Properties p_i48534_3_) {
+        public FinsArmor(ArmorMaterial materialIn, EquipmentSlot slot, Properties p_i48534_3_) {
             super(materialIn, slot, p_i48534_3_);
         }
 
         @Override
-        public <A extends BipedModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, A _default) {
-            return Animalia.PROXY.getFinsModel(armorSlot);
-        }
-
-        @Override
-        public void onArmorTick(ItemStack itemStack, World world, PlayerEntity player) {
-            ItemStack head = player.getItemBySlot(EquipmentSlotType.CHEST);
+        public void onArmorTick(ItemStack itemStack, Level world, Player player) {
+            ItemStack head = player.getItemBySlot(EquipmentSlot.CHEST);
             if (head.getItem() == ModItems.FINS.get() && player.isEyeInFluid(FluidTags.WATER)) {
-                if (!player.hasEffect(Effect.byId(30))) {
-                    EffectInstance statusEffect = new EffectInstance(Effects.DOLPHINS_GRACE, 100, 0);
+                if (!player.hasEffect(MobEffect.byId(30))) {
+                    MobEffectInstance statusEffect = new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 100, 0);
                     player.addEffect(statusEffect);
                 }
             }

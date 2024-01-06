@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.WhiteSharkModel;
 import com.cozary.animalia.entities.WhiteSharkEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class WhiteSharkRenderer extends MobRenderer<WhiteSharkEntity, WhiteSharkModel<WhiteSharkEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/white_shark.png");
 
-    public WhiteSharkRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new WhiteSharkModel<>(), 0.7F);
+    public WhiteSharkRenderer(EntityRendererProvider.Context context) {
+        super(context, new WhiteSharkModel<>(context.bakeLayer(ClientEventBusSubscriber.WHITE_SHARK)), 0.5F);
     }
 
     @Override

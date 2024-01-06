@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.HippopotamusModel;
 import com.cozary.animalia.entities.HippopotamusEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class HippopotamusRenderer extends MobRenderer<HippopotamusEntity, HippopotamusModel<HippopotamusEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/hippopotamus.png");
 
-    public HippopotamusRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new HippopotamusModel<>(), 1.0F);
+    public HippopotamusRenderer(EntityRendererProvider.Context context) {
+        super(context, new HippopotamusModel<>(context.bakeLayer(ClientEventBusSubscriber.HIPPOPOTAMUS)), 0.5F);
     }
 
     @Override

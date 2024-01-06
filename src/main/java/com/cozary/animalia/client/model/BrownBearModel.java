@@ -23,53 +23,54 @@ package com.cozary.animalia.client.model;
 
 import com.cozary.animalia.entities.BrownBearEntity;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.entity.model.AgeableModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.util.Mth;
 
-public class BrownBearModel<T extends BrownBearEntity> extends AgeableModel<T> {
-    private final ModelRenderer body;
-    private final ModelRenderer head;
-    private final ModelRenderer leg0;
-    private final ModelRenderer leg1;
-    private final ModelRenderer leg2;
-    private final ModelRenderer leg3;
+public class BrownBearModel<T extends BrownBearEntity> extends AgeableListModel<T> {
+    private final ModelPart body;
+    private final ModelPart head;
+    private final ModelPart leg0;
+    private final ModelPart leg1;
+    private final ModelPart leg2;
+    private final ModelPart leg3;
 
-    public BrownBearModel() {
-        texWidth = 128;
-        texHeight = 128;
-
-        body = new ModelRenderer(this);
-        body.setPos(0.0F, 8.0F, -1.0F);
-        setRotationAngle(body, 1.5708F, 0.0F, 0.0F);
-        body.texOffs(0, 0).addBox(-7.0F, 0.0F, -6.0F, 14.0F, 14.0F, 11.0F, 0.0F, false);
-        body.texOffs(0, 25).addBox(-6.0F, -12.0F, -6.0F, 12.0F, 12.0F, 10.0F, 0.0F, false);
-
-        head = new ModelRenderer(this);
-        head.setPos(0.0F, 10.0F, -13.0F);
-        head.texOffs(0, 47).addBox(-3.5F, -3.0F, -7.0F, 7.0F, 7.0F, 7.0F, 0.0F, false);
-        head.texOffs(39, 0).addBox(-2.5F, 1.0F, -10.0F, 5.0F, 3.0F, 3.0F, 0.0F, false);
-        head.texOffs(0, 3).addBox(-4.5F, -4.0F, -5.0F, 2.0F, 2.0F, 1.0F, 0.0F, false);
-        head.texOffs(0, 0).addBox(2.5F, -4.0F, -5.0F, 2.0F, 2.0F, 1.0F, 0.0F, false);
-
-        leg0 = new ModelRenderer(this);
-        leg0.setPos(-4.5F, 14.0F, 8.0F);
-        leg0.texOffs(42, 17).addBox(-2.0F, 0.0F, -4.0F, 4.0F, 10.0F, 8.0F, 0.0F, false);
-
-        leg1 = new ModelRenderer(this);
-        leg1.setPos(4.5F, 14.0F, 8.0F);
-        leg1.texOffs(36, 39).addBox(-2.0F, 0.0F, -4.0F, 4.0F, 10.0F, 8.0F, 0.0F, false);
-
-        leg2 = new ModelRenderer(this);
-        leg2.setPos(-3.5F, 14.0F, -7.0F);
-        leg2.texOffs(54, 54).addBox(-2.0F, 0.0F, -3.0F, 4.0F, 10.0F, 6.0F, 0.0F, false);
-
-        leg3 = new ModelRenderer(this);
-        leg3.setPos(3.5F, 14.0F, -7.0F);
-        leg3.texOffs(50, 0).addBox(-2.0F, 0.0F, -3.0F, 4.0F, 10.0F, 6.0F, 0.0F, false);
+    public BrownBearModel(ModelPart root) {
+        this.body = root.getChild("body");
+        this.head = root.getChild("head");
+        this.leg0 = root.getChild("leg0");
+        this.leg1 = root.getChild("leg1");
+        this.leg2 = root.getChild("leg2");
+        this.leg3 = root.getChild("leg3");
     }
 
-    //TODO AL LEVANTARSE PARA ATACAR LA ANIMACIÓN ES ERRONEA
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-7.0F, 0.0F, -6.0F, 14.0F, 14.0F, 11.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 25).addBox(-6.0F, -12.0F, -6.0F, 12.0F, 12.0F, 10.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 8.0F, -1.0F, 1.5708F, 0.0F, 0.0F));
+
+        PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 47).addBox(-3.5F, -3.0F, -7.0F, 7.0F, 7.0F, 7.0F, new CubeDeformation(0.0F))
+                .texOffs(39, 0).addBox(-2.5F, 1.0F, -10.0F, 5.0F, 3.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 3).addBox(-4.5F, -4.0F, -5.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 0).addBox(2.5F, -4.0F, -5.0F, 2.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 10.0F, -13.0F));
+
+        PartDefinition leg0 = partdefinition.addOrReplaceChild("leg0", CubeListBuilder.create().texOffs(42, 17).addBox(-2.0F, 0.0F, -4.0F, 4.0F, 10.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(-4.5F, 14.0F, 8.0F));
+
+        PartDefinition leg1 = partdefinition.addOrReplaceChild("leg1", CubeListBuilder.create().texOffs(36, 39).addBox(-2.0F, 0.0F, -4.0F, 4.0F, 10.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(4.5F, 14.0F, 8.0F));
+
+        PartDefinition leg2 = partdefinition.addOrReplaceChild("leg2", CubeListBuilder.create().texOffs(54, 54).addBox(-2.0F, 0.0F, -3.0F, 4.0F, 10.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(-3.5F, 14.0F, -7.0F));
+
+        PartDefinition leg3 = partdefinition.addOrReplaceChild("leg3", CubeListBuilder.create().texOffs(50, 0).addBox(-2.0F, 0.0F, -3.0F, 4.0F, 10.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(3.5F, 14.0F, -7.0F));
+
+        return LayerDefinition.create(meshdefinition, 128, 128);
+    }
+
 
     @Override
     public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -77,10 +78,10 @@ public class BrownBearModel<T extends BrownBearEntity> extends AgeableModel<T> {
             this.head.z = -15.5F;
             this.head.y = 10.5F;
         }
-        this.leg0.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-        this.leg1.xRot = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-        this.leg2.xRot = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
-        this.leg3.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+        this.leg0.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+        this.leg1.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+        this.leg2.xRot = Mth.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
+        this.leg3.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
         this.head.xRot = headPitch * ((float) Math.PI / 180F);
         this.head.yRot = netHeadYaw * ((float) Math.PI / 180F);
         float f = ageInTicks - (float) entityIn.tickCount;
@@ -105,11 +106,11 @@ public class BrownBearModel<T extends BrownBearEntity> extends AgeableModel<T> {
         this.head.xRot += f1 * (float) Math.PI * 0.15F;
         boolean flag2 = entityIn.func_213578_dZ();
         if (flag2) {
-            this.head.xRot = ((float) Math.PI / 2F) + 0.2F * MathHelper.sin(ageInTicks * 0.6F);
-            this.leg2.xRot = -0.4F - 0.2F * MathHelper.sin(ageInTicks * 0.6F);
-            this.leg2.yRot = -0.4F - 0.2F * MathHelper.sin(ageInTicks * 0.6F);
-            this.leg3.xRot = -0.4F - 0.2F * MathHelper.sin(ageInTicks * 0.6F);
-            this.leg3.yRot = 0.4F - 0.2F * MathHelper.sin(ageInTicks * 0.6F);
+            this.head.xRot = ((float) Math.PI / 2F) + 0.2F * Mth.sin(ageInTicks * 0.6F);
+            this.leg2.xRot = -0.4F - 0.2F * Mth.sin(ageInTicks * 0.6F);
+            this.leg2.yRot = -0.4F - 0.2F * Mth.sin(ageInTicks * 0.6F);
+            this.leg3.xRot = -0.4F - 0.2F * Mth.sin(ageInTicks * 0.6F);
+            this.leg3.yRot = 0.4F - 0.2F * Mth.sin(ageInTicks * 0.6F);
         } else {
             this.leg2.yRot = 0.0F;
             this.leg3.yRot = 0.0F;
@@ -117,18 +118,28 @@ public class BrownBearModel<T extends BrownBearEntity> extends AgeableModel<T> {
     }
 
     @Override
-    protected Iterable<ModelRenderer> headParts() {
+    protected Iterable<ModelPart> headParts() {
         return ImmutableList.of(this.head);
     }
 
     @Override
-    protected Iterable<ModelRenderer> bodyParts() {
+    protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(this.body, this.leg0, this.leg1, this.leg2, this.leg3);
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        body.render(poseStack, buffer, packedLight, packedOverlay);
+        head.render(poseStack, buffer, packedLight, packedOverlay);
+        leg0.render(poseStack, buffer, packedLight, packedOverlay);
+        leg1.render(poseStack, buffer, packedLight, packedOverlay);
+        leg2.render(poseStack, buffer, packedLight, packedOverlay);
+        leg3.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

@@ -22,16 +22,20 @@
 package com.cozary.animalia.biomes.core.registry;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.blockplacer.SimpleBlockPlacer;
-import net.minecraft.world.gen.blockstateprovider.WeightedBlockStateProvider;
-import net.minecraft.world.gen.feature.*;
-import net.minecraft.world.gen.placement.ChanceConfig;
-import net.minecraft.world.gen.placement.Placement;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.blockplacers.SimpleBlockPlacer;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
+import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
+import net.minecraft.world.level.levelgen.placement.FeatureDecorator;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -46,15 +50,15 @@ public class ModFeatures {
     }
 
     public static final class Configs {
-        public static final BlockClusterFeatureConfig MORE_BLUE_ORCHID_CONFIG = (new BlockClusterFeatureConfig.Builder(new WeightedBlockStateProvider().add(BlockStates.BLUE_ORCHID, 1), SimpleBlockPlacer.INSTANCE)).xspread(5).zspread(5).tries(128).build();
+        public static final RandomPatchConfiguration MORE_BLUE_ORCHID_CONFIG = (new RandomPatchConfiguration.GrassConfigurationBuilder(new SimpleStateProvider(BlockStates.BLUE_ORCHID), SimpleBlockPlacer.INSTANCE)).xspread(10).zspread(10).tries(128).build();
     }
 
     public static final class Configured {
 
-        public static final ConfiguredFeature<?, ?> MORE_BLUE_ORCHID = Feature.FLOWER.configured(Configs.MORE_BLUE_ORCHID_CONFIG).decorated(Features.Placements.HEIGHTMAP).decorated(Placement.CHANCE.configured(new ChanceConfig(1)));
+        public static final ConfiguredFeature<?, ?> MORE_BLUE_ORCHID = Feature.FLOWER.configured(Configs.MORE_BLUE_ORCHID_CONFIG).decorated(Features.Decorators.HEIGHTMAP).decorated(FeatureDecorator.CHANCE.configured(new ChanceDecoratorConfiguration(1)));
 
-        private static <FC extends IFeatureConfig> void register(String name, ConfiguredFeature<FC, ?> configuredFeature) {
-            Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(Animalia.MOD_ID, name), configuredFeature);
+        private static <FC extends FeatureConfiguration> void register(String name, ConfiguredFeature<FC, ?> configuredFeature) {
+            Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, new ResourceLocation(Animalia.MOD_ID, name), configuredFeature);
         }
 
         public static void registerConfiguredFeatures() {

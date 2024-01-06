@@ -23,28 +23,34 @@ package com.cozary.animalia.entities;
 
 import com.cozary.animalia.init.ModEntityTypes;
 import com.cozary.animalia.init.ModSound;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PolarBearEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.PolarBear;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -52,11 +58,11 @@ import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.UUID;
 
-public class WalrusEntity extends AnimalEntity implements IAngerable {
+public class WalrusEntity extends Animal implements NeutralMob {
 
     public static final Ingredient TEMPTATION_ITEMS = Ingredient.of(Items.TROPICAL_FISH, Items.PUFFERFISH, Items.COD, Items.SALMON);
     //private static final DataParameter<Boolean> IS_STANDING = EntityDataManager.defineId(WalrusEntity.class, DataSerializers.BOOLEAN);
-    private static final RangedInteger field_234217_by_ = TickRangeConverter.rangeOfSeconds(20, 39);
+    private static final UniformInt field_234217_by_ = TimeUtil.rangeOfSeconds(20, 39);
     private static final boolean test = false;
     private float clientSideStandAnimation0;
     private float clientSideStandAnimation;
@@ -64,19 +70,19 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
     private int field_234218_bz_;
     private UUID field_234216_bA_;
 
-    public WalrusEntity(EntityType<? extends WalrusEntity> type, World worldIn) {
+    public WalrusEntity(EntityType<? extends WalrusEntity> type, Level worldIn) {
         super(type, worldIn);
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.createMobAttributes()
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 35.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.25D)
                 .add(Attributes.FOLLOW_RANGE, 20.0D)
                 .add(Attributes.ATTACK_DAMAGE, 6.0D);
     }
 
-    public static boolean canWalrusSpawn(EntityType<? extends WalrusEntity> entityType, IWorld world, SpawnReason spawnReason, BlockPos pos, Random random) {
+    public static boolean canWalrusSpawn(EntityType<? extends WalrusEntity> entityType, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, Random random) {
         return world.getBlockState(pos.below()).getBlock() == Blocks.ICE || world.getBlockState(pos.below()).getBlock() == Blocks.SNOW || world.getBlockState(pos.below()).getBlock() == Blocks.SNOW_BLOCK || world.getBlockState(pos.below()).getBlock() == Blocks.BLUE_ICE && world.getLightEmission(pos) > 8 && world.canSeeSky(pos);
 
     }
@@ -84,21 +90,21 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(9, new SwimGoal(this));
-        this.goalSelector.addGoal(1, new RandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, false, TEMPTATION_ITEMS));
+        this.goalSelector.addGoal(9, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new RandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, TEMPTATION_ITEMS, false));
         this.goalSelector.addGoal(3, new FollowParentGoal(this, 1.1D));
-        this.goalSelector.addGoal(4, new LookAtGoal(this, PlayerEntity.class, 6.0F));
-        this.goalSelector.addGoal(5, new LookRandomlyGoal(this));
-        this.goalSelector.addGoal(6, new FindWaterGoal(this));
+        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(6, new TryFindWaterGoal(this));
         this.goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
-        this.goalSelector.addGoal(8, new SwimGoal(this));
+        this.goalSelector.addGoal(8, new FloatGoal(this));
         this.goalSelector.addGoal(0, new MeleeAttackGoal(this, 1.25D, true));
         this.targetSelector.addGoal(0, new HurtByTargetGoal());
         this.targetSelector.addGoal(1, new AttackPlayerGoal());
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, 10, true, false, this::isAngryAt));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, PolarBearEntity.class, 10, true, true, null));
-        this.targetSelector.addGoal(4, new ResetAngerGoal<>(this, false));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, PolarBear.class, 10, true, true, null));
+        this.targetSelector.addGoal(4, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
     /**
@@ -107,13 +113,13 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
 
 
     @Override
-    public void readAdditionalSaveData(CompoundNBT compound) {
+    public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        this.readPersistentAngerSaveData((ServerWorld) this.level, compound);
+        this.readPersistentAngerSaveData(this.level, compound);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundNBT compound) {
+    public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         //this.entityData.define(IS_STANDING, false);
         this.addPersistentAngerSaveData(compound);
@@ -144,16 +150,9 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
 
     @Override
     public void startPersistentAngerTimer() {
-        this.setRemainingPersistentAngerTime(field_234217_by_.randomValue(this.random));
+        this.setRemainingPersistentAngerTime(field_234217_by_.sample(this.random));
 
     }
-
-    @Nullable
-    @Override
-    public AgeableEntity getBreedOffspring(ServerWorld p_241840_1_, AgeableEntity p_241840_2_) {
-        return ModEntityTypes.WALRUS.get().create(this.level);
-    }
-
 
     /**
      * Called to update the entity's position/logic.
@@ -169,7 +168,7 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
             //if (this.isStanding()) {
             //    this.clientSideStandAnimation = MathHelper.clamp(this.clientSideStandAnimation + 1.0F, 0.0F, 6.0F);
             //} else {
-            this.clientSideStandAnimation = MathHelper.clamp(this.clientSideStandAnimation - 1.0F, 0.0F, 6.0F);
+            this.clientSideStandAnimation = Mth.clamp(this.clientSideStandAnimation - 1.0F, 0.0F, 6.0F);
             //}
         }
 
@@ -178,12 +177,12 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
         }
 
         if (!this.level.isClientSide) {
-            this.updatePersistentAnger((ServerWorld) this.level, true);
+            this.updatePersistentAnger((ServerLevel) this.level, true);
         }
 
     }
 
-    public EntitySize getDimensions(Pose poseIn) {
+    public EntityDimensions getDimensions(Pose poseIn) {
         if (this.clientSideStandAnimation > 0.0F) {
             float f = this.clientSideStandAnimation / 6.0F;
             float f1 = 1.0F + f;
@@ -220,16 +219,22 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
     }
 
     @Override
-    public ILivingEntityData finalizeSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, MobSpawnType reason, @Nullable SpawnGroupData spawnDataIn, @Nullable CompoundTag dataTag) {
         if (spawnDataIn == null) {
-            spawnDataIn = new AgeableData(0.5F);
+            spawnDataIn = new AgeableMobGroupData(0.5F);
         }
 
         return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
     }
 
+    @Nullable
     @Override
-    protected int getExperienceReward(PlayerEntity player) {
+    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
+        return ModEntityTypes.WALRUS.get().create(this.level);
+    }
+
+    @Override
+    protected int getExperienceReward(Player player) {
         return 3 + this.level.random.nextInt(4);
     }
 
@@ -263,11 +268,11 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public Vector3d func_241205_ce_() {
-        return new Vector3d(0.0D, 0.6F * this.getEyeHeight(), this.getBbWidth() * 0.4F);
+    public Vec3 func_241205_ce_() {
+        return new Vec3(0.0D, 0.6F * this.getEyeHeight(), this.getBbWidth() * 0.4F);
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player) {
+    public boolean canBeLeashedTo(Player player) {
         return false;
     }
 
@@ -276,9 +281,9 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
         return true;
     }
 
-    class AttackPlayerGoal extends NearestAttackableTargetGoal<PlayerEntity> {
+    class AttackPlayerGoal extends NearestAttackableTargetGoal<Player> {
         public AttackPlayerGoal() {
-            super(WalrusEntity.this, PlayerEntity.class, 20, true, true, null);
+            super(WalrusEntity.this, Player.class, 20, true, true, null);
         }
 
         public boolean canUse() {
@@ -303,7 +308,7 @@ public class WalrusEntity extends AnimalEntity implements IAngerable {
         }
     }
 
-    class HurtByTargetGoal extends net.minecraft.entity.ai.goal.HurtByTargetGoal {
+    class HurtByTargetGoal extends net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal {
         public HurtByTargetGoal() {
             super(WalrusEntity.this);
         }

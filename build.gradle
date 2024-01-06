@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -12,57 +11,47 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.16.5-2.1.2'
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+
+repositories {
+    maven {
+        name = "JEI maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    flatDir { dirs 'deps' }
+}
+
+version = "${minecraft_version}-${mod_version}" + getBuildNumber()
 group = 'com.cozary.animalia'
 archivesBaseName = 'Animalia'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
 
-    mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'official', version: '1.17.1'
 
     runs {
         client {
-            property "mixin.env.disableRefMap", "true"
             workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            property 'forge.logging.console.level', 'debug'
-
             mods {
                 animalia {
                     source sourceSets.main
                 }
             }
         }
-
         server {
-            property "mixin.env.disableRefMap", "true"
             workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            property 'forge.logging.console.level', 'debug'
-
             mods {
                 animalia {
                     source sourceSets.main
                 }
             }
         }
-
         data {
             workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'animalia', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
+            args '--mod', 'animalia', '--all', '--output', file("src/generated/resources/"), '--existing', file("src/main/resources/")
             mods {
                 animalia {
                     source sourceSets.main
@@ -75,22 +64,31 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.20'
+    implementation 'org.jetbrains:annotations:20.1.0'
 
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 }
+
+jar.finalizedBy('reobfJar')
 
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : "animalia",
-                "Specification-Vendor"    : "animalia",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${version}",
-                "Implementation-Vendor"   : "animalia",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Version": "${version}"
         ])
     }
 }
 
-jar.finalizedBy('reobfJar')
+task apiJar(type: Jar) {
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+    classifier = 'api'
+}
+
+
+String getBuildNumber() {
+    return System.getenv('BUILD_NUMBER') ? ".jenkins" + System.getenv('BUILD_NUMBER') : "";
+}

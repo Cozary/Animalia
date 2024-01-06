@@ -25,11 +25,11 @@ import com.cozary.animalia.Animalia;
 import com.cozary.animalia.biomes.core.registry.ModFeatures;
 import com.cozary.animalia.biomes.features.custom.MudLakeFeature;
 import com.cozary.animalia.biomes.features.custom.WaterSpringExtraFeature;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.DefaultBiomeFeatures;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.structure.StructureFeatures;
+import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.common.world.MobSpawnInfoBuilder;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
@@ -56,63 +56,63 @@ public class AnimaliaBiomeFeatures {
 
     public static void withDesertLakesFeatures(BiomeGenerationSettingsBuilder settings, MobSpawnInfoBuilder spawns) {
 
-        DefaultBiomeFeatures.addDefaultOverworldLandStructures(settings);
-        DefaultBiomeFeatures.addDefaultMonsterRoom(settings);
-        DefaultBiomeFeatures.addDefaultUndergroundVariety(settings);
-        DefaultBiomeFeatures.addDefaultOres(settings);
-        DefaultBiomeFeatures.addDefaultSoftDisks(settings);
-        DefaultBiomeFeatures.addDefaultCarvers(settings);
-        DefaultBiomeFeatures.addFossilDecoration(settings);
-        DefaultBiomeFeatures.addDefaultFlowers(settings);
-        DefaultBiomeFeatures.addBadlandGrass(settings);
-        DefaultBiomeFeatures.addDesertVegetation(settings);
-        DefaultBiomeFeatures.addDefaultMushrooms(settings);
-        DefaultBiomeFeatures.addDesertExtraVegetation(settings);
-        DefaultBiomeFeatures.addDesertExtraDecoration(settings);
-        DefaultBiomeFeatures.addSurfaceFreezing(settings);
+        BiomeDefaultFeatures.addDefaultOverworldLandStructures(settings);
+        BiomeDefaultFeatures.addDefaultMonsterRoom(settings);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(settings);
+        BiomeDefaultFeatures.addDefaultOres(settings);
+        BiomeDefaultFeatures.addDefaultSoftDisks(settings);
+        BiomeDefaultFeatures.addDefaultCarvers(settings);
+        BiomeDefaultFeatures.addFossilDecoration(settings);
+        BiomeDefaultFeatures.addDefaultFlowers(settings);
+        BiomeDefaultFeatures.addBadlandGrass(settings);
+        BiomeDefaultFeatures.addDesertVegetation(settings);
+        BiomeDefaultFeatures.addDefaultMushrooms(settings);
+        BiomeDefaultFeatures.addDesertExtraVegetation(settings);
+        BiomeDefaultFeatures.addDesertExtraDecoration(settings);
+        BiomeDefaultFeatures.addSurfaceFreezing(settings);
 
         withExtraLakes(settings);
 
     }
 
     private static void withExtraLakes(BiomeGenerationSettingsBuilder builder) {
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, WaterSpringExtraFeature.WATER_SPRING_EXTRA);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, WaterSpringExtraFeature.WATER_SPRING_EXTRA);
     }
 
 
     public static void withMuddySwampFeatures(BiomeGenerationSettingsBuilder settings, MobSpawnInfoBuilder spawns) {
 
-        DefaultBiomeFeatures.addDefaultOverworldLandStructures(settings);
-        DefaultBiomeFeatures.addDefaultCarvers(settings);
-        DefaultBiomeFeatures.addDefaultLakes(settings);
-        DefaultBiomeFeatures.addDefaultMonsterRoom(settings);
-        DefaultBiomeFeatures.addDefaultUndergroundVariety(settings);
-        DefaultBiomeFeatures.addDefaultOres(settings);
-        DefaultBiomeFeatures.addDefaultSoftDisks(settings);
-        DefaultBiomeFeatures.addDefaultMushrooms(settings);
-        DefaultBiomeFeatures.addSwampExtraVegetation(settings);
-        DefaultBiomeFeatures.addDefaultSprings(settings);
-        DefaultBiomeFeatures.addSurfaceFreezing(settings);
-        DefaultBiomeFeatures.addSwampVegetation(settings);
+        BiomeDefaultFeatures.addDefaultOverworldLandStructures(settings);
+        BiomeDefaultFeatures.addDefaultCarvers(settings);
+        BiomeDefaultFeatures.addDefaultLakes(settings);
+        BiomeDefaultFeatures.addDefaultMonsterRoom(settings);
+        BiomeDefaultFeatures.addDefaultUndergroundVariety(settings);
+        BiomeDefaultFeatures.addDefaultOres(settings);
+        BiomeDefaultFeatures.addDefaultSoftDisks(settings);
+        BiomeDefaultFeatures.addDefaultMushrooms(settings);
+        BiomeDefaultFeatures.addSwampExtraVegetation(settings);
+        BiomeDefaultFeatures.addDefaultSprings(settings);
+        BiomeDefaultFeatures.addSurfaceFreezing(settings);
+        BiomeDefaultFeatures.addSwampVegetation(settings);
 
         settings.addStructureStart(StructureFeatures.RUINED_PORTAL_SWAMP);
-        settings.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.SEAGRASS_SWAMP);
+        settings.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.SEAGRASS_SWAMP);
 
         withMuddySwampVegetation(settings);
         withMuddySwampLake(settings);
     }
 
     private static void withMuddySwampVegetation(BiomeGenerationSettingsBuilder builder) {
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.FLOWER_SWAMP);
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.PATCH_WATERLILLY);
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.BROWN_MUSHROOM_SWAMP);
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.RED_MUSHROOM_SWAMP);
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, ModFeatures.Configured.MORE_BLUE_ORCHID);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.FLOWER_SWAMP);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.PATCH_WATERLILLY);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.BROWN_MUSHROOM_SWAMP);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, Features.RED_MUSHROOM_SWAMP);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModFeatures.Configured.MORE_BLUE_ORCHID);
 
     }
 
     private static void withMuddySwampLake(BiomeGenerationSettingsBuilder builder) {
-        builder.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, MudLakeFeature.MUD_LAKES);
+        builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, MudLakeFeature.MUD_LAKES);
     }
 
 

@@ -22,8 +22,8 @@
 package com.cozary.animalia.blocks;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 
 public class BlockItemBase extends BlockItem {
 

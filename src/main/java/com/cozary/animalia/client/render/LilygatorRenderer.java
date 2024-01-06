@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.LilygatorModel;
 import com.cozary.animalia.entities.LilygatorEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class LilygatorRenderer extends MobRenderer<LilygatorEntity, LilygatorModel<LilygatorEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/lilygator.png");
 
-    public LilygatorRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new LilygatorModel<>(), 0.7F);
+    public LilygatorRenderer(EntityRendererProvider.Context context) {
+        super(context, new LilygatorModel<>(context.bakeLayer(ClientEventBusSubscriber.LILYGATOR)), 0.5F);
     }
 
     @Override

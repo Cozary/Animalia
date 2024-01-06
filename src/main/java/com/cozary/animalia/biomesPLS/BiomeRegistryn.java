@@ -23,9 +23,9 @@ package com.cozary.animalia.biomesPLS;
 
 import com.cozary.animalia.AnimaliaRegistry;
 import com.cozary.animalia.util.AnimaliaConfig;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.event.RegistryEvent;
@@ -67,8 +67,8 @@ public class BiomeRegistryn {
 
     public static class BiomeKeys {
 
-        public static final RegistryKey<Biome> muddy_swamp = RegistryKey.create(Registry.BIOME_REGISTRY, AnimaliaRegistry.location("muddy_swamp"));
-        public static final RegistryKey<Biome> desert_lakes = RegistryKey.create(Registry.BIOME_REGISTRY, AnimaliaRegistry.location("desert_lakes"));
+        public static final ResourceKey<Biome> muddy_swamp = ResourceKey.create(Registry.BIOME_REGISTRY, AnimaliaRegistry.location("muddy_swamp"));
+        public static final ResourceKey<Biome> desert_lakes = ResourceKey.create(Registry.BIOME_REGISTRY, AnimaliaRegistry.location("desert_lakes"));
 
     }
 }

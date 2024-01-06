@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.SnailModel;
 import com.cozary.animalia.entities.SnailEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class SnailRenderer extends MobRenderer<SnailEntity, SnailModel<SnailEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/snail.png");
 
-    public SnailRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new SnailModel<>(), 0.3F);
+    public SnailRenderer(EntityRendererProvider.Context context) {
+        super(context, new SnailModel<>(context.bakeLayer(ClientEventBusSubscriber.SNAIL)), 0.5F);
     }
 
     @Override

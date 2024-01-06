@@ -21,21 +21,21 @@
 
 package com.cozary.animalia.entities.ModTypes;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 
-public class FlyingMobEntity extends AnimalEntity {
+public class FlyingMobEntity extends Animal {
 
-    protected FlyingMobEntity(EntityType<? extends AnimalEntity> type, World worldIn) {
+    protected FlyingMobEntity(EntityType<? extends Animal> type, Level worldIn) {
         super(type, worldIn);
     }
 
@@ -47,7 +47,7 @@ public class FlyingMobEntity extends AnimalEntity {
     protected void checkFallDamage(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
     }
 
-    public void travel(Vector3d travelVector) {
+    public void travel(Vec3 travelVector) {
         if (this.isInWater()) {
             this.moveRelative(0.02F, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
@@ -60,12 +60,12 @@ public class FlyingMobEntity extends AnimalEntity {
             BlockPos ground = new BlockPos(this.getX(), this.getY() - 1.0D, this.getZ());
             float f = 0.91F;
             if (this.onGround) {
-                f = this.level.getBlockState(ground).getSlipperiness(this.level, ground, this) * 0.91F;
+                f = this.level.getBlockState(ground).getFriction(this.level, ground, this) * 0.91F;
             }
             float f1 = 0.16277137F / (f * f * f);
             f = 0.91F;
             if (this.onGround) {
-                f = this.level.getBlockState(ground).getSlipperiness(this.level, ground, this) * 0.91F;
+                f = this.level.getBlockState(ground).getFriction(this.level, ground, this) * 0.91F;
             }
             this.moveRelative(this.onGround ? 0.1F * f1 : 0.02F, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
@@ -81,7 +81,7 @@ public class FlyingMobEntity extends AnimalEntity {
 
     @Nullable
     @Override
-    public AgeableEntity getBreedOffspring(ServerWorld p_241840_1_, AgeableEntity p_241840_2_) {
+    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
         return null;
     }
 }

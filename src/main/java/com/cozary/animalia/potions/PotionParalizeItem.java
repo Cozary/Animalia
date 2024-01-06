@@ -22,19 +22,19 @@
 package com.cozary.animalia.potions;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.UseAction;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
 public class PotionParalizeItem extends Item {
 
@@ -57,8 +57,8 @@ public class PotionParalizeItem extends Item {
      */
 
     @Override
-    public UseAction getUseAnimation(ItemStack p_77661_1_) {
-        return UseAction.DRINK;
+    public UseAnim getUseAnimation(ItemStack p_77661_1_) {
+        return UseAnim.DRINK;
     }
 
     /**
@@ -67,9 +67,9 @@ public class PotionParalizeItem extends Item {
      */
 
     @Override
-    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         playerIn.startUsingItem(handIn);
-        return ActionResult.success(playerIn.getItemInHand(handIn));
+        return InteractionResultHolder.success(playerIn.getItemInHand(handIn));
     }
 
     /**
@@ -78,26 +78,26 @@ public class PotionParalizeItem extends Item {
      */
 
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity entityLiving) {
-        PlayerEntity playerentity = entityLiving instanceof PlayerEntity ? (PlayerEntity) entityLiving : null;
-        if (playerentity instanceof ServerPlayerEntity) {
-            CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity) playerentity, stack);
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entityLiving) {
+        Player playerentity = entityLiving instanceof Player ? (Player) entityLiving : null;
+        if (playerentity instanceof ServerPlayer) {
+            CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) playerentity, stack);
         }
-        if (world instanceof ServerWorld) {
-            playerentity.addEffect(new EffectInstance(RegistryObjects.PARALIZE_EFFECT, 3600, 0));
+        if (world instanceof ServerLevel) {
+            playerentity.addEffect(new MobEffectInstance(RegistryObjects.PARALIZE_EFFECT, 3600, 0));
         }
         if (playerentity != null) {
             playerentity.awardStat(Stats.ITEM_USED.get(this));
-            if (!playerentity.abilities.instabuild) {
+            if (!playerentity.getAbilities().instabuild) {
                 stack.shrink(1);
             }
         }
-        if (playerentity == null || !playerentity.abilities.instabuild) {
+        if (playerentity == null || !playerentity.getAbilities().instabuild) {
             if (stack.isEmpty()) {
                 return new ItemStack(Items.GLASS_BOTTLE);
             }
             if (playerentity != null) {
-                playerentity.inventory.add(new ItemStack(Items.GLASS_BOTTLE));
+                playerentity.getInventory().add(new ItemStack(Items.GLASS_BOTTLE));
             }
         }
         return stack;

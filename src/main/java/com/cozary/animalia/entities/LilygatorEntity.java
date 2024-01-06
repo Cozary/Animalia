@@ -22,43 +22,43 @@
 package com.cozary.animalia.entities;
 
 import com.cozary.animalia.init.ModSound;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PigEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
+public class LilygatorEntity extends Animal {
+    public static EntityDataAccessor<Boolean> AGRESSIVE = SynchedEntityData.defineId(LilygatorEntity.class, EntityDataSerializers.BOOLEAN);
 
-public class LilygatorEntity extends AnimalEntity {
-    public static DataParameter<Boolean> AGRESSIVE = EntityDataManager.defineId(LilygatorEntity.class, DataSerializers.BOOLEAN);
-
-    public LilygatorEntity(EntityType<? extends AnimalEntity> type, World worldIn) {
+    public LilygatorEntity(EntityType<? extends Animal> type, Level worldIn) {
         super(type, worldIn);
         entityData.define(AGRESSIVE, false);
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.createMobAttributes()
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 15.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.3D)
                 .add(Attributes.ATTACK_DAMAGE, 7.0D)
@@ -70,21 +70,21 @@ public class LilygatorEntity extends AnimalEntity {
      * Uses for Spawn
      */
 
-    public static boolean canLilygatorSpawn(EntityType<? extends LilygatorEntity> entityType, IWorld world, SpawnReason spawnReason, BlockPos pos, Random random) {
+    public static boolean canLilygatorSpawn(EntityType<? extends LilygatorEntity> entityType, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, Random random) {
         return world.getBlockState(pos.below()).getBlock() == Blocks.GRASS_BLOCK || world.getBlockState(pos.below()).getBlock() == Blocks.LILY_PAD && world.getLightEmission(pos) > 8 && world.canSeeSky(pos);
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(4, new SwimGoal(this));
-        this.goalSelector.addGoal(1, new RandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(2, new LookAtGoal(this, PlayerEntity.class, 10.0F));
-        this.goalSelector.addGoal(3, new LookRandomlyGoal(this));
+        this.goalSelector.addGoal(4, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new RandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 10.0F));
+        this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(0, new MeleeAttackGoal(this, 1.5D, true));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, DirtyPigEntity.class, true));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, PigEntity.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Pig.class, true));
     }
 
     public boolean canBreatheUnderwater() {
@@ -97,7 +97,7 @@ public class LilygatorEntity extends AnimalEntity {
     }
 
     @Override
-    protected int getExperienceReward(PlayerEntity player) {
+    protected int getExperienceReward(Player player) {
         return 4 + this.level.random.nextInt(4);
     }
 
@@ -131,14 +131,14 @@ public class LilygatorEntity extends AnimalEntity {
      * @return
      */
 
-    @Nullable
-    @Override
-    public AgeableEntity getBreedOffspring(ServerWorld p_241840_1_, AgeableEntity p_241840_2_) {
-        return null;
-    }
-
     private boolean isAgressiveL() {
         return this.targetSelector.getRunningGoals().anyMatch(goal -> goal.getGoal().getClass() == NearestAttackableTargetGoal.class);
+    }
+
+    @Nullable
+    @Override
+    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
+        return null;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class LilygatorEntity extends AnimalEntity {
         }
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player) {
+    public boolean canBeLeashedTo(Player player) {
         return false;
     }
 

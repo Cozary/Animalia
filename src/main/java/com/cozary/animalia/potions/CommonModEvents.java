@@ -22,11 +22,11 @@
 package com.cozary.animalia.potions;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Item;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -37,9 +37,9 @@ public class CommonModEvents {
         reg.register(ResourceLocations.POTION_HEALTH_HINDER, new PotionHealthHinderItem(new Item.Properties().tab(Animalia.TAB)));
     }
 
-    public static void onRegisterEffects(Registrator<Effect> reg) {
-        reg.register(ResourceLocations.PARALIZE, new ParalizeEffect(EffectType.HARMFUL, 0xd4d139).addAttributeModifier(Attributes.MOVEMENT_SPEED, "7107DE5E-7CE8-4030-940E-514C1F160890", -1F, AttributeModifier.Operation.MULTIPLY_TOTAL));
-        reg.register(ResourceLocations.HEALTH_HINDER, new HealthHinderEffect(EffectType.HARMFUL, 0xa52437).addAttributeModifier(Attributes.MAX_HEALTH, "7107DE5E-7CE8-4030-940E-514C1F160890", -0.05F, AttributeModifier.Operation.MULTIPLY_TOTAL));
+    public static void onRegisterEffects(Registrator<MobEffect> reg) {
+        reg.register(ResourceLocations.PARALIZE, new ParalizeEffect(MobEffectCategory.HARMFUL, 0xd4d139).addAttributeModifier(Attributes.MOVEMENT_SPEED, "7107DE5E-7CE8-4030-940E-514C1F160890", -1F, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        reg.register(ResourceLocations.HEALTH_HINDER, new HealthHinderEffect(MobEffectCategory.HARMFUL, 0xa52437).addAttributeModifier(Attributes.MAX_HEALTH, "7107DE5E-7CE8-4030-940E-514C1F160890", -0.05F, AttributeModifier.Operation.MULTIPLY_TOTAL));
     }
 
 

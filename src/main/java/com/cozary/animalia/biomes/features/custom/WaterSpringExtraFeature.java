@@ -24,15 +24,15 @@ package com.cozary.animalia.biomes.features.custom;
 import com.cozary.animalia.AnimaliaRegistry;
 import com.cozary.animalia.biomes.features.ModDecorators;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.LiquidsConfig;
-import net.minecraft.world.gen.placement.ChanceConfig;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.SpringConfiguration;
+import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
 
 public class WaterSpringExtraFeature {
@@ -41,11 +41,11 @@ public class WaterSpringExtraFeature {
     public static ConfiguredFeature<?, ?> WATER_SPRING_EXTRA;
 
     public static void registerConfiguredFeatures() {
-        Registry<ConfiguredFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_FEATURE;
+        Registry<ConfiguredFeature<?, ?>> registry = BuiltinRegistries.CONFIGURED_FEATURE;
 
         WATER_SPRING_EXTRA = Feature.SPRING
-                .configured(new LiquidsConfig(WATER, true, 4, 1, ImmutableSet.of(Blocks.STONE, Blocks.GRANITE, Blocks.DIORITE, Blocks.ANDESITE)))
-                .decorated(ModDecorators.WATER_SPRING_EXTRA.get().configured(new ChanceConfig(100)));
+                .configured(new SpringConfiguration(WATER, true, 4, 1, ImmutableSet.of(Blocks.STONE, Blocks.GRANITE, Blocks.DIORITE, Blocks.ANDESITE)))
+                .decorated(ModDecorators.WATER_SPRING_EXTRA.get().configured(new ChanceDecoratorConfiguration(100)));
         Registry.register(registry, AnimaliaRegistry.location("water_spring_extra"), WATER_SPRING_EXTRA);
     }
 

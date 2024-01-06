@@ -22,7 +22,7 @@
 package com.cozary.animalia.potions;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class ResourceLocations {
 

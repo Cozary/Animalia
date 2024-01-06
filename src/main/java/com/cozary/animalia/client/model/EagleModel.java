@@ -23,52 +23,55 @@ package com.cozary.animalia.client.model;
 
 import com.cozary.animalia.entities.EagleEntity;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.entity.model.AgeableModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.AgeableListModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.util.Mth;
 
-public class EagleModel<T extends EagleEntity> extends AgeableModel<T> {
-    private final ModelRenderer cabeza;
-    private final ModelRenderer cuerpo;
-    private final ModelRenderer wingRight;
-    private final ModelRenderer wingLeft;
-    private final ModelRenderer legLeft;
-    private final ModelRenderer legRight;
+public class EagleModel<T extends EagleEntity> extends AgeableListModel<T> {
+    private final ModelPart cabeza;
+    private final ModelPart cuerpo;
+    private final ModelPart wingRight;
+    private final ModelPart wingLeft;
+    private final ModelPart legLeft;
+    private final ModelPart legRight;
 
-    public EagleModel() {
-        texWidth = 32;
-        texHeight = 32;
+    public EagleModel(ModelPart root) {
+        this.cabeza = root.getChild("cabeza");
+        this.cuerpo = root.getChild("cuerpo");
+        this.wingRight = root.getChild("wingRight");
+        this.wingLeft = root.getChild("wingLeft");
+        this.legLeft = root.getChild("legLeft");
+        this.legRight = root.getChild("legRight");
+    }
 
-        cabeza = new ModelRenderer(this);
-        cabeza.setPos(0.5F, 18.0F, -4.0F);
-        cabeza.texOffs(0, 13).addBox(-1.5F, -2.0F, -3.0F, 3.0F, 2.0F, 3.0F, 0.0F, false);
-        cabeza.texOffs(9, 13).addBox(-0.5F, -1.0F, -5.0F, 1.0F, 1.0F, 2.0F, 0.0F, false);
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
 
-        cuerpo = new ModelRenderer(this);
-        cuerpo.setPos(0.0F, 19.0F, 1.0F);
-        cuerpo.texOffs(0, 0).addBox(-2.0F, -2.0F, -5.0F, 5.0F, 3.0F, 10.0F, 0.0F, false);
+        PartDefinition cabeza = partdefinition.addOrReplaceChild("cabeza", CubeListBuilder.create().texOffs(0, 13).addBox(-1.5F, -2.0F, -3.0F, 3.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(9, 13).addBox(-0.5F, -1.0F, -5.0F, 1.0F, 1.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.5F, 18.0F, -4.0F));
 
-        wingRight = new ModelRenderer(this);
-        wingRight.setPos(-2.0F, 17.0F, 1.0F);
-        wingRight.texOffs(5, 5).addBox(0.0F, 0.0F, -3.0F, -6.0F, 1.0F, 3.0F, 0.0F, false);
-        wingRight.texOffs(6, 4).addBox(0.0F, 0.0F, 0.0F, -5.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(6, 4).addBox(0.0F, 0.0F, 1.0F, -4.0F, 1.0F, 1.0F, 0.0F, false);
-        wingRight.texOffs(1, 5).addBox(-2.0F, 0.0F, 2.0F, 2.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition cuerpo = partdefinition.addOrReplaceChild("cuerpo", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -2.0F, -5.0F, 5.0F, 3.0F, 10.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 19.0F, 1.0F));
 
-        wingLeft = new ModelRenderer(this);
-        wingLeft.setPos(3.0F, 17.0F, 1.0F);
-        wingLeft.texOffs(4, 4).addBox(6.0F, 0.0F, -3.0F, -6.0F, 1.0F, 3.0F, 0.0F, false);
-        wingLeft.texOffs(7, 3).addBox(5.0F, 0.0F, 0.0F, -5.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(17, 4).addBox(4.0F, 0.0F, 1.0F, -4.0F, 1.0F, 1.0F, 0.0F, false);
-        wingLeft.texOffs(12, 3).addBox(0.0F, 0.0F, 2.0F, 2.0F, 1.0F, 1.0F, 0.0F, false);
+        PartDefinition wingRight = partdefinition.addOrReplaceChild("wingRight", CubeListBuilder.create().texOffs(5, 5).addBox(0.0F, 0.0F, -3.0F, -6.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(6, 4).addBox(0.0F, 0.0F, 0.0F, -5.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(6, 4).addBox(0.0F, 0.0F, 1.0F, -4.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(1, 5).addBox(-2.0F, 0.0F, 2.0F, 2.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, 17.0F, 1.0F));
 
-        legLeft = new ModelRenderer(this);
-        legLeft.setPos(2.5F, 18.0F, 6.0F);
-        legLeft.texOffs(20, 4).addBox(-0.5F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, 0.0F, false);
+        PartDefinition wingLeft = partdefinition.addOrReplaceChild("wingLeft", CubeListBuilder.create().texOffs(4, 4).addBox(6.0F, 0.0F, -3.0F, -6.0F, 1.0F, 3.0F, new CubeDeformation(0.0F))
+                .texOffs(7, 3).addBox(5.0F, 0.0F, 0.0F, -5.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(17, 4).addBox(4.0F, 0.0F, 1.0F, -4.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(12, 3).addBox(0.0F, 0.0F, 2.0F, 2.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(3.0F, 17.0F, 1.0F));
 
-        legRight = new ModelRenderer(this);
-        legRight.setPos(-1.5F, 18.0F, 6.0F);
-        legRight.texOffs(20, 0).addBox(-0.5F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, 0.0F, false);
+        PartDefinition legLeft = partdefinition.addOrReplaceChild("legLeft", CubeListBuilder.create().texOffs(20, 4).addBox(-0.5F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(2.5F, 18.0F, 6.0F));
+
+        PartDefinition legRight = partdefinition.addOrReplaceChild("legRight", CubeListBuilder.create().texOffs(20, 0).addBox(-0.5F, 0.0F, 0.0F, 1.0F, 3.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.5F, 18.0F, 6.0F));
+
+        return LayerDefinition.create(meshdefinition, 32, 32);
     }
 
 
@@ -76,23 +79,33 @@ public class EagleModel<T extends EagleEntity> extends AgeableModel<T> {
     public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.cabeza.xRot = headPitch * ((float) Math.PI / 180F);
         this.cabeza.yRot = netHeadYaw * ((float) Math.PI / 180F);
-        this.wingRight.zRot = MathHelper.sin(ageInTicks * 0.9F) * 0.5F;
+        this.wingRight.zRot = Mth.sin(ageInTicks * 0.9F) * 0.5F;
         this.wingLeft.zRot = -this.wingRight.zRot;
     }
 
     @Override
-    protected Iterable<ModelRenderer> headParts() {
+    protected Iterable<ModelPart> headParts() {
         return ImmutableList.of(this.cabeza);
     }
 
     @Override
-    protected Iterable<ModelRenderer> bodyParts() {
+    protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(this.cuerpo, this.wingRight, this.wingLeft, this.legLeft, this.legRight);
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        cabeza.render(poseStack, buffer, packedLight, packedOverlay);
+        cuerpo.render(poseStack, buffer, packedLight, packedOverlay);
+        wingRight.render(poseStack, buffer, packedLight, packedOverlay);
+        wingLeft.render(poseStack, buffer, packedLight, packedOverlay);
+        legLeft.render(poseStack, buffer, packedLight, packedOverlay);
+        legRight.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

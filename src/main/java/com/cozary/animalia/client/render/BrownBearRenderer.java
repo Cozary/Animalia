@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.BrownBearModel;
 import com.cozary.animalia.entities.BrownBearEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class BrownBearRenderer extends MobRenderer<BrownBearEntity, BrownBearModel<BrownBearEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/brown_bear.png");
 
-    public BrownBearRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new BrownBearModel<>(), 0.6F);
+    public BrownBearRenderer(EntityRendererProvider.Context context) {
+        super(context, new BrownBearModel<>(context.bakeLayer(ClientEventBusSubscriber.BROWN_BEAR)), 0.5F);
     }
 
     @Override

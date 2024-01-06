@@ -21,24 +21,42 @@
 
 package com.cozary.animalia.client.render.armor;
 
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.LivingEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.world.entity.LivingEntity;
 
-public class ShellModel extends BipedModel<LivingEntity> {
+public class ShellModel extends HumanoidModel<LivingEntity> {
 
-    public ShellModel(float modelSize) {
-        super(modelSize, 0.0F, 64, 64);
+    private final ModelPart Body;
 
-        ModelRenderer shell = new ModelRenderer(this);
-        shell.setPos(0.0F, 0.0F, 0.0F);
-        body.addChild(shell);
-        shell.texOffs(0, 0).addBox(-8.0F, -3.0F, 0.0F, 16.0F, 16.0F, 16.0F, -2.0F, false);
+    public ShellModel(ModelPart root) {
+        super(root);
+        this.Body = root.getChild("Body");
     }
 
-    public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
+
+        PartDefinition Body = partdefinition.addOrReplaceChild("Body", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        PartDefinition shell = Body.addOrReplaceChild("shell", CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -3.0F, 0.0F, 16.0F, 16.0F, 16.0F, new CubeDeformation(-2.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        return LayerDefinition.create(meshdefinition, 64, 64);
+    }
+
+    public void setRotationAngle(ModelPart modelRenderer, float x, float y, float z) {
         modelRenderer.xRot = x;
         modelRenderer.yRot = y;
         modelRenderer.zRot = z;
+    }
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        Body.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

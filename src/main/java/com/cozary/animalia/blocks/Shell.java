@@ -21,18 +21,16 @@
 
 package com.cozary.animalia.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+
 
 public class Shell extends Block {
     public Shell() {
         super(Properties.of(Material.STONE)
                 .strength(2.0f, 2.0f)
                 .sound(SoundType.STONE)
-                .harvestLevel(1)
-                .harvestTool(ToolType.PICKAXE)
                 .requiresCorrectToolForDrops()
         );
     }

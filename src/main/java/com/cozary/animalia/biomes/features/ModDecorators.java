@@ -25,9 +25,9 @@ package com.cozary.animalia.biomes.features;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.biomes.features.custom.LakeMud;
 import com.cozary.animalia.biomes.features.custom.WaterSpringExtra;
-import net.minecraft.world.gen.placement.ChanceConfig;
-import net.minecraft.world.gen.placement.Placement;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
+import net.minecraft.world.level.levelgen.placement.FeatureDecorator;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -36,12 +36,12 @@ import java.util.function.Supplier;
 
 public class ModDecorators {
 
-    public static final DeferredRegister<Placement<?>> DECORATORS = DeferredRegister.create(ForgeRegistries.DECORATORS, Animalia.MOD_ID);
+    public static final DeferredRegister<FeatureDecorator<?>> DECORATORS = DeferredRegister.create(ForgeRegistries.DECORATORS, Animalia.MOD_ID);
 
-    public static final RegistryObject<LakeMud> MUD_LAKE = register("mud_lake", () -> new LakeMud(ChanceConfig.CODEC));
-    public static final RegistryObject<WaterSpringExtra> WATER_SPRING_EXTRA = register("water_spring_extra", () -> new WaterSpringExtra(ChanceConfig.CODEC));
+    public static final RegistryObject<LakeMud> MUD_LAKE = register("mud_lake", () -> new LakeMud(ChanceDecoratorConfiguration.CODEC));
+    public static final RegistryObject<WaterSpringExtra> WATER_SPRING_EXTRA = register("water_spring_extra", () -> new WaterSpringExtra(ChanceDecoratorConfiguration.CODEC));
 
-    private static <T extends Placement<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {
+    private static <T extends FeatureDecorator<?>> RegistryObject<T> register(final String name, final Supplier<T> sup) {
         return DECORATORS.register(name, sup);
     }
 }

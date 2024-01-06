@@ -22,12 +22,12 @@
 package com.cozary.animalia.util.enums;
 
 import com.cozary.animalia.init.ModItems;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.function.Supplier;
 
-public enum ModItemTier implements IItemTier {
+public enum ModItemTier implements Tier {
 
     WALRUS(3, 500, 7.0F, 3.0F, 12, () -> {
         return Ingredient.of(ModItems.WALRUS_FANG.get());

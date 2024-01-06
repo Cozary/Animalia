@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.PlatypusModel;
 import com.cozary.animalia.entities.PlatypusEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class PlatypusRenderer extends MobRenderer<PlatypusEntity, PlatypusModel<PlatypusEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/platypus.png");
 
-    public PlatypusRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new PlatypusModel<>(), 0.3F);
+    public PlatypusRenderer(EntityRendererProvider.Context context) {
+        super(context, new PlatypusModel<>(context.bakeLayer(ClientEventBusSubscriber.PLATYPUS)), 0.5F);
     }
 
     @Override

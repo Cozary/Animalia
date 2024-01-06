@@ -22,7 +22,7 @@
 package com.cozary.animalia.items;
 
 import com.cozary.animalia.Animalia;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public class ItemBase extends Item {
 

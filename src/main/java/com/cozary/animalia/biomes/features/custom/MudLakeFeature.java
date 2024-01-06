@@ -24,23 +24,23 @@ package com.cozary.animalia.biomes.features.custom;
 import com.cozary.animalia.AnimaliaRegistry;
 import com.cozary.animalia.biomes.features.ModDecorators;
 import com.cozary.animalia.init.ModFluids;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.feature.BlockStateFeatureConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.placement.ChanceConfig;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration;
+import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
 
 
 public class MudLakeFeature {
     public static ConfiguredFeature<?, ?> MUD_LAKES;
 
     public static void registerConfiguredFeatures() {
-        Registry<ConfiguredFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_FEATURE;
+        Registry<ConfiguredFeature<?, ?>> registry = BuiltinRegistries.CONFIGURED_FEATURE;
 
         MUD_LAKES = Feature.LAKE
-                .configured(new BlockStateFeatureConfig(ModFluids.MUD_BLOCK.get().defaultBlockState()))
-                .decorated(ModDecorators.MUD_LAKE.get().configured(new ChanceConfig(50)));
+                .configured(new BlockStateConfiguration(ModFluids.MUD_FLUID.get().getFlowing().defaultFluidState().createLegacyBlock()))
+                .decorated(ModDecorators.MUD_LAKE.get().configured(new ChanceDecoratorConfiguration(50)));
         Registry.register(registry, AnimaliaRegistry.location("mud_lakes"), MUD_LAKES);
     }
 

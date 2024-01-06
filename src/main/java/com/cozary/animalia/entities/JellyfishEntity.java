@@ -25,43 +25,46 @@ import com.cozary.animalia.init.ModItems;
 import com.cozary.animalia.init.ModSound;
 import com.cozary.animalia.potions.RegistryObjects;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.AvoidEntityGoal;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.PanicGoal;
-import net.minecraft.entity.passive.WaterMobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
+public class JellyfishEntity extends WaterAnimal {
 
-public class JellyfishEntity extends WaterMobEntity {
-
-    private static final DataParameter<Boolean> FROM_BUCKET = EntityDataManager.defineId(JellyfishEntity.class, DataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(JellyfishEntity.class, EntityDataSerializers.BOOLEAN);
     public float squidPitch;
     public float prevSquidPitch;
     public float squidYaw;
@@ -77,14 +80,14 @@ public class JellyfishEntity extends WaterMobEntity {
     private float randomMotionVecY;
     private float randomMotionVecZ;
 
-    public JellyfishEntity(EntityType<? extends JellyfishEntity> type, World worldIn) {
+    public JellyfishEntity(EntityType<? extends JellyfishEntity> type, Level worldIn) {
         super(type, worldIn);
         this.random.setSeed(this.getId());
         this.rotationVelocity = 1.0F / (this.random.nextFloat() + 1.0F) * 0.2F;
     }
 
-    public static AttributeModifierMap.MutableAttribute setCustomAttributes() {
-        return MobEntity.createMobAttributes()
+    public static AttributeSupplier.Builder setCustomAttributes() {
+        return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 3.0D);
     }
 
@@ -92,8 +95,12 @@ public class JellyfishEntity extends WaterMobEntity {
      * Uses for Spawn
      */
 
-    public static boolean canJellyfishSpawn(EntityType<? extends JellyfishEntity> entityType, IWorld worldIn, SpawnReason spawnReason, BlockPos pos, Random random) {
+    public static boolean canJellyfishSpawn(EntityType<? extends JellyfishEntity> entityType, LevelAccessor worldIn, MobSpawnType spawnReason, BlockPos pos, Random random) {
         return pos.getY() > 5 && pos.getY() < worldIn.getSeaLevel();
+    }
+
+    public static double horizontalMag(Vec3 vec) {
+        return vec.x * vec.x + vec.z * vec.z;
     }
 
     @Override
@@ -102,7 +109,7 @@ public class JellyfishEntity extends WaterMobEntity {
         this.goalSelector.addGoal(0, new MoveRandomGoal(this));
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.25D));
         this.goalSelector.addGoal(2, new FleeGoal());
-        this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, PlayerEntity.class, 8.0F, 1.6D, 1.4D, EntityPredicates.NO_SPECTATORS::test));
+        this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, Player.class, 8.0F, 1.6D, 1.4D, EntitySelector.NO_SPECTATORS::test));
     }
 
     /**
@@ -123,7 +130,6 @@ public class JellyfishEntity extends WaterMobEntity {
         return !this.isFromBucket() && !this.hasCustomName();
     }
 
-
     public boolean isFromBucket() {
         return this.entityData.get(FROM_BUCKET);
     }
@@ -139,19 +145,19 @@ public class JellyfishEntity extends WaterMobEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundNBT compound) {
+    public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.setFromBucket(compound.getBoolean("FromBucket"));
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundNBT compound) {
+    public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.isFromBucket());
     }
 
     @Override
-    public ActionResultType mobInteract(PlayerEntity p_230254_1_, Hand p_230254_2_) {
+    public InteractionResult mobInteract(Player p_230254_1_, InteractionHand p_230254_2_) {
         ItemStack itemstack = p_230254_1_.getItemInHand(p_230254_2_);
         if (itemstack.getItem() == Items.WATER_BUCKET && this.isAlive()) {
             this.playSound(SoundEvents.BUCKET_FILL_FISH, 1.0F, 1.0F);
@@ -159,15 +165,15 @@ public class JellyfishEntity extends WaterMobEntity {
             ItemStack itemstack1 = this.getFishBucket();
             this.setBucketData(itemstack1);
             if (!this.level.isClientSide) {
-                CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayerEntity) p_230254_1_, itemstack1);
+                CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) p_230254_1_, itemstack1);
             }
             if (itemstack.isEmpty()) {
                 p_230254_1_.setItemInHand(p_230254_2_, itemstack1);
-            } else if (!p_230254_1_.inventory.add(itemstack1)) {
+            } else if (!p_230254_1_.getInventory().add(itemstack1)) {
                 p_230254_1_.drop(itemstack1, false);
             }
-            this.remove();
-            return ActionResultType.sidedSuccess(this.level.isClientSide);
+            this.remove(RemovalReason.KILLED);
+            return InteractionResult.sidedSuccess(this.level.isClientSide);
         } else {
             return super.mobInteract(p_230254_1_, p_230254_2_);
         }
@@ -185,12 +191,12 @@ public class JellyfishEntity extends WaterMobEntity {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose poseIn, EntitySize sizeIn) {
+    protected float getStandingEyeHeight(Pose poseIn, EntityDimensions sizeIn) {
         return sizeIn.height * 0.5F;
     }
 
     @Override
-    protected int getExperienceReward(PlayerEntity player) {
+    protected int getExperienceReward(Player player) {
         return 1 + this.level.random.nextInt(4);
     }
 
@@ -219,11 +225,6 @@ public class JellyfishEntity extends WaterMobEntity {
     }
 
     @Override
-    protected boolean isMovementNoisy() {
-        return false;
-    }
-
-    @Override
     @OnlyIn(Dist.CLIENT)
     public void handleEntityEvent(byte id) {
         if (id == 19) {
@@ -245,12 +246,12 @@ public class JellyfishEntity extends WaterMobEntity {
     }
 
     @Override
-    public void travel(Vector3d travelVector) {
+    public void travel(Vec3 travelVector) {
         this.move(MoverType.SELF, this.getDeltaMovement());
     }
 
     @Override
-    public boolean canBeLeashed(PlayerEntity player) {
+    public boolean canBeLeashed(Player player) {
         return true;
     }
 
@@ -259,13 +260,14 @@ public class JellyfishEntity extends WaterMobEntity {
         if (source.getEntity() instanceof LivingEntity) {
             LivingEntity livingentity = (LivingEntity) source.getEntity();
             if (!source.isExplosion()) {
-                livingentity.addEffect(new EffectInstance(Effects.POISON, 60, 1));
-                livingentity.addEffect(new EffectInstance(RegistryObjects.PARALIZE_EFFECT, 10, 1));
+                livingentity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 1));
+                livingentity.addEffect(new MobEffectInstance(RegistryObjects.PARALIZE_EFFECT, 10, 1));
             }
         }
         return super.hurt(source, amount);
     }
 
+    @Override
     public void aiStep() {
         super.aiStep();
         this.prevSquidPitch = this.squidPitch;
@@ -289,7 +291,7 @@ public class JellyfishEntity extends WaterMobEntity {
         if (this.isInWaterOrBubble()) {
             if (this.squidRotation < (float) Math.PI) {
                 float f = this.squidRotation / (float) Math.PI;
-                this.tentacleAngle = MathHelper.sin(f * f * (float) Math.PI) * (float) Math.PI * 0.25F;
+                this.tentacleAngle = Mth.sin(f * f * (float) Math.PI) * (float) Math.PI * 0.25F;
                 if ((double) f > 0.75D) {
                     this.randomMotionSpeed = 1.0F;
                     this.rotateSpeed = 1.0F;
@@ -306,18 +308,18 @@ public class JellyfishEntity extends WaterMobEntity {
                 this.setDeltaMovement(this.randomMotionVecX * this.randomMotionSpeed, this.randomMotionVecY * this.randomMotionSpeed, this.randomMotionVecZ * this.randomMotionSpeed);
             }
 
-            Vector3d vector3d = this.getDeltaMovement();
-            float f1 = MathHelper.sqrt(getHorizontalDistanceSqr(vector3d));
-            this.yBodyRot += (-((float) MathHelper.atan2(vector3d.x, vector3d.z)) * (180F / (float) Math.PI) - this.yBodyRot) * 0.1F;
-            this.yRot = this.yBodyRot;
+            Vec3 vector3d = this.getDeltaMovement();
+            float f1 = Mth.sqrt((float) horizontalMag(vector3d));
+            this.yBodyRot += (-((float) Mth.atan2(vector3d.x, vector3d.z)) * (180F / (float) Math.PI) - this.yBodyRot) * 0.1F;
+            this.yRotO = this.yBodyRot;
             this.squidYaw = (float) ((double) this.squidYaw + Math.PI * (double) this.rotateSpeed * 1.5D);
-            this.squidPitch += (-((float) MathHelper.atan2(f1, vector3d.y)) * (180F / (float) Math.PI) - this.squidPitch) * 0.1F;
+            this.squidPitch += (-((float) Mth.atan2(f1, vector3d.y)) * (180F / (float) Math.PI) - this.squidPitch) * 0.1F;
         } else {
-            this.tentacleAngle = MathHelper.abs(MathHelper.sin(this.squidRotation)) * (float) Math.PI * 0.25F;
+            this.tentacleAngle = Mth.abs(Mth.sin(this.squidRotation)) * (float) Math.PI * 0.25F;
             if (!this.level.isClientSide) {
                 double d0 = this.getDeltaMovement().y;
-                if (this.hasEffect(Effects.LEVITATION)) {
-                    d0 = 0.05D * (double) (this.getEffect(Effects.LEVITATION).getAmplifier() + 1);
+                if (this.hasEffect(MobEffects.LEVITATION)) {
+                    d0 = 0.05D * (double) (this.getEffect(MobEffects.LEVITATION).getAmplifier() + 1);
                 } else if (!this.isNoGravity()) {
                     d0 -= 0.08D;
                 }
@@ -365,7 +367,7 @@ public class JellyfishEntity extends WaterMobEntity {
             ++this.tickCounter;
             LivingEntity livingentity = JellyfishEntity.this.getTarget();
             if (livingentity != null) {
-                Vector3d vector3d = new Vector3d(JellyfishEntity.this.getX() - livingentity.getX(), JellyfishEntity.this.getY() - livingentity.getY(), JellyfishEntity.this.getZ() - livingentity.getZ());
+                Vec3 vector3d = new Vec3(JellyfishEntity.this.getX() - livingentity.getX(), JellyfishEntity.this.getY() - livingentity.getY(), JellyfishEntity.this.getZ() - livingentity.getZ());
                 BlockState blockstate = JellyfishEntity.this.level.getBlockState(new BlockPos(JellyfishEntity.this.getX() + vector3d.x, JellyfishEntity.this.getY() + vector3d.y, JellyfishEntity.this.getZ() + vector3d.z));
                 FluidState fluidstate = JellyfishEntity.this.level.getFluidState(new BlockPos(JellyfishEntity.this.getX() + vector3d.x, JellyfishEntity.this.getY() + vector3d.y, JellyfishEntity.this.getZ() + vector3d.z));
                 if (fluidstate.is(FluidTags.WATER) || blockstate.isAir()) {
@@ -421,9 +423,9 @@ public class JellyfishEntity extends WaterMobEntity {
                 this.squid.setMovementVector(0.0F, 0.0F, 0.0F);
             } else if (this.squid.getRandom().nextInt(50) == 0 || !this.squid.isInWater() || !this.squid.hasMovementVector()) {
                 float f = this.squid.getRandom().nextFloat() * ((float) Math.PI * 2F);
-                float f1 = MathHelper.cos(f) * 0.2F;
+                float f1 = Mth.cos(f) * 0.2F;
                 float f2 = -0.1F + this.squid.getRandom().nextFloat() * 0.2F;
-                float f3 = MathHelper.sin(f) * 0.2F;
+                float f3 = Mth.sin(f) * 0.2F;
                 this.squid.setMovementVector(f1, f2, f3);
             }
 

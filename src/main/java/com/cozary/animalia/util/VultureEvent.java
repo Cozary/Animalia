@@ -22,8 +22,8 @@
 package com.cozary.animalia.util;
 
 import com.cozary.animalia.entities.VultureEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityEvent;
 
 public class VultureEvent extends EntityEvent {
@@ -38,7 +38,7 @@ public class VultureEvent extends EntityEvent {
 
     @HasResult
     public static class SummonAidEvent extends VultureEvent {
-        private final World world;
+        private final Level world;
         private final int x;
         private final int y;
         private final int z;
@@ -46,7 +46,7 @@ public class VultureEvent extends EntityEvent {
         private final double summonChance;
         private VultureEntity customSummonedAid;
 
-        public SummonAidEvent(VultureEntity entity, World world, int x, int y, int z, LivingEntity attacker, double summonChance) {
+        public SummonAidEvent(VultureEntity entity, Level world, int x, int y, int z, LivingEntity attacker, double summonChance) {
             super(entity);
             this.world = world;
             this.x = x;
@@ -68,7 +68,7 @@ public class VultureEvent extends EntityEvent {
             this.customSummonedAid = customSummonedAid;
         }
 
-        public World getWorld() {
+        public Level getWorld() {
             return world;
         }
 

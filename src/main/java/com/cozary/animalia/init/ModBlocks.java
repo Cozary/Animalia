@@ -23,10 +23,10 @@ package com.cozary.animalia.init;
 
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.blocks.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -36,7 +36,7 @@ public class ModBlocks {
     //Mud
     public static final RegistryObject<Block> MUD_BLOCK = BLOCKS.register("mud_block", MudBlock::new);
     public static final RegistryObject<Block> DECORATIVE_MUD = BLOCKS.register("decorative_mud", DecorativeMud::new);
-    public static final RegistryObject<Block> DECORATIVE_MUD_STAIRS = BLOCKS.register("decorative_mud_stairs", () -> new StairsBlock(() ->
+    public static final RegistryObject<Block> DECORATIVE_MUD_STAIRS = BLOCKS.register("decorative_mud_stairs", () -> new StairBlock(() ->
             ModBlocks.DECORATIVE_MUD.get().defaultBlockState(),
             Block.Properties.copy(ModBlocks.DECORATIVE_MUD.get())));
     public static final RegistryObject<Block> DECORATIVE_MUD_SLAB = BLOCKS.register("decorative_mud_slab", () -> new SlabBlock(Block.Properties.copy(ModBlocks.DECORATIVE_MUD.get())));

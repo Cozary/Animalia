@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "animalia:mud_flowing",
-    "animalia:mud_fluid"
+    "animalia:mud_fluid",
+    "animalia:mud_flowing"
   ]
 }

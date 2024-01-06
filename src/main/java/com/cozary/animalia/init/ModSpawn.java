@@ -24,11 +24,11 @@ package com.cozary.animalia.init;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.biomesPLS.BiomeRegistryn;
 import com.cozary.animalia.util.AnimaliaConfig;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.MobSpawnInfo;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -44,56 +44,56 @@ public class ModSpawn {
         if (event.getName() != null) {
             Biome biome = ForgeRegistries.BIOMES.getValue(event.getName());
 
-            RegistryKey<Biome> biomeKey = RegistryKey.create(ForgeRegistries.Keys.BIOMES, event.getName());
+            ResourceKey<Biome> biomeKey = ResourceKey.create(ForgeRegistries.Keys.BIOMES, event.getName());
 
             if (biome != null) {
                 if (biomeKey == BiomeRegistryn.BiomeKeys.muddy_swamp) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.DIRTY_PIG.get(), AnimaliaConfig.SPAWN.MuddySwampDirtyPigWeight.get(), AnimaliaConfig.SPAWN.MuddySwampDirtyPigMin.get(), AnimaliaConfig.SPAWN.MuddySwampDirtyPigMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.DIRTY_PIG.get(), AnimaliaConfig.SPAWN.MuddySwampDirtyPigWeight.get(), AnimaliaConfig.SPAWN.MuddySwampDirtyPigMin.get(), AnimaliaConfig.SPAWN.MuddySwampDirtyPigMax.get()));
                 }
                 if (biomeKey == Biomes.SWAMP || biomeKey == Biomes.SWAMP_HILLS) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.DIRTY_PIG.get(), AnimaliaConfig.SPAWN.DirtyPigWeight.get(), AnimaliaConfig.SPAWN.DirtyPigMin.get(), AnimaliaConfig.SPAWN.DirtyPigMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.DIRTY_PIG.get(), AnimaliaConfig.SPAWN.DirtyPigWeight.get(), AnimaliaConfig.SPAWN.DirtyPigMin.get(), AnimaliaConfig.SPAWN.DirtyPigMax.get()));
                 }
                 if (biomeKey == Biomes.BIRCH_FOREST || biomeKey == Biomes.BIRCH_FOREST_HILLS || biomeKey == Biomes.TALL_BIRCH_FOREST || biomeKey == Biomes.TALL_BIRCH_HILLS) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.SNAIL.get(), AnimaliaConfig.SPAWN.SnailWeight.get(), AnimaliaConfig.SPAWN.SnailMin.get(), AnimaliaConfig.SPAWN.SnailMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.SNAIL.get(), AnimaliaConfig.SPAWN.SnailWeight.get(), AnimaliaConfig.SPAWN.SnailMin.get(), AnimaliaConfig.SPAWN.SnailMax.get()));
                 }
                 if (biomeKey == Biomes.ICE_SPIKES || biomeKey == Biomes.FROZEN_OCEAN || biomeKey == Biomes.SNOWY_BEACH || biomeKey == Biomes.SNOWY_TUNDRA) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.WALRUS.get(), AnimaliaConfig.SPAWN.WalrusWeight.get(), AnimaliaConfig.SPAWN.WalrusMin.get(), AnimaliaConfig.SPAWN.WalrusMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.WALRUS.get(), AnimaliaConfig.SPAWN.WalrusWeight.get(), AnimaliaConfig.SPAWN.WalrusMin.get(), AnimaliaConfig.SPAWN.WalrusMax.get()));
                 }
                 if (biomeKey == Biomes.RIVER || biomeKey == Biomes.FOREST || biomeKey == Biomes.SWAMP) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.PLATYPUS.get(), AnimaliaConfig.SPAWN.PlatypusWeight.get(), AnimaliaConfig.SPAWN.PlatypusMin.get(), AnimaliaConfig.SPAWN.PlatypusMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.PLATYPUS.get(), AnimaliaConfig.SPAWN.PlatypusWeight.get(), AnimaliaConfig.SPAWN.PlatypusMin.get(), AnimaliaConfig.SPAWN.PlatypusMax.get()));
                 }
                 if (biomeKey == Biomes.FOREST || biomeKey == Biomes.BIRCH_FOREST) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.BROWN_BEAR.get(), AnimaliaConfig.SPAWN.BrownBearWeight.get(), AnimaliaConfig.SPAWN.BrownBearMin.get(), AnimaliaConfig.SPAWN.BrownBearMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.BROWN_BEAR.get(), AnimaliaConfig.SPAWN.BrownBearWeight.get(), AnimaliaConfig.SPAWN.BrownBearMin.get(), AnimaliaConfig.SPAWN.BrownBearMax.get()));
                 }
                 if (biomeKey == Biomes.PLAINS) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.BULL.get(), AnimaliaConfig.SPAWN.BullWeight.get(), AnimaliaConfig.SPAWN.BullMin.get(), AnimaliaConfig.SPAWN.BullMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.BULL.get(), AnimaliaConfig.SPAWN.BullWeight.get(), AnimaliaConfig.SPAWN.BullMin.get(), AnimaliaConfig.SPAWN.BullMax.get()));
                 }
-                if (event.getCategory() == Biome.Category.FOREST || event.getCategory() == Biome.Category.PLAINS || event.getCategory() == Biome.Category.EXTREME_HILLS) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.EAGLE.get(), AnimaliaConfig.SPAWN.EagleWeight.get(), AnimaliaConfig.SPAWN.EagleMin.get(), AnimaliaConfig.SPAWN.EagleMax.get()));
+                if (event.getCategory() == Biome.BiomeCategory.FOREST || event.getCategory() == Biome.BiomeCategory.PLAINS || event.getCategory() == Biome.BiomeCategory.EXTREME_HILLS) {
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.EAGLE.get(), AnimaliaConfig.SPAWN.EagleWeight.get(), AnimaliaConfig.SPAWN.EagleMin.get(), AnimaliaConfig.SPAWN.EagleMax.get()));
                 }
-                if (event.getCategory() == Biome.Category.DESERT) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.HIPPOPOTAMUS.get(), AnimaliaConfig.SPAWN.HippopotamusWeight.get(), AnimaliaConfig.SPAWN.HippopotamusMin.get(), AnimaliaConfig.SPAWN.HippopotamusMax.get()));
+                if (event.getCategory() == Biome.BiomeCategory.DESERT) {
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.HIPPOPOTAMUS.get(), AnimaliaConfig.SPAWN.HippopotamusWeight.get(), AnimaliaConfig.SPAWN.HippopotamusMin.get(), AnimaliaConfig.SPAWN.HippopotamusMax.get()));
                 }
                 if (biomeKey == BiomeRegistryn.BiomeKeys.desert_lakes) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.HIPPOPOTAMUS.get(), AnimaliaConfig.SPAWN.DesertLakesHippopotamusWeight.get(), AnimaliaConfig.SPAWN.DesertLakesHippopotamusMin.get(), AnimaliaConfig.SPAWN.DesertLakesHippopotamusMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.HIPPOPOTAMUS.get(), AnimaliaConfig.SPAWN.DesertLakesHippopotamusWeight.get(), AnimaliaConfig.SPAWN.DesertLakesHippopotamusMin.get(), AnimaliaConfig.SPAWN.DesertLakesHippopotamusMax.get()));
                 }
                 if (biomeKey == Biomes.SWAMP) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.LILYGATOR.get(), AnimaliaConfig.SPAWN.LilygatorWeight.get(), AnimaliaConfig.SPAWN.LilygatorMin.get(), AnimaliaConfig.SPAWN.LilygatorMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.LILYGATOR.get(), AnimaliaConfig.SPAWN.LilygatorWeight.get(), AnimaliaConfig.SPAWN.LilygatorMin.get(), AnimaliaConfig.SPAWN.LilygatorMax.get()));
                 }
                 if (biomeKey == BiomeRegistryn.BiomeKeys.muddy_swamp) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.LILYGATOR.get(), AnimaliaConfig.SPAWN.MuddySwampLilygatorWeight.get(), AnimaliaConfig.SPAWN.MuddySwampLilygatorMin.get(), AnimaliaConfig.SPAWN.MuddySwampLilygatorMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.LILYGATOR.get(), AnimaliaConfig.SPAWN.MuddySwampLilygatorWeight.get(), AnimaliaConfig.SPAWN.MuddySwampLilygatorMin.get(), AnimaliaConfig.SPAWN.MuddySwampLilygatorMax.get()));
                 }
                 if (biomeKey == Biomes.DEEP_COLD_OCEAN || biomeKey == Biomes.DEEP_FROZEN_OCEAN || biomeKey == Biomes.DEEP_OCEAN || biomeKey == Biomes.DEEP_LUKEWARM_OCEAN || biomeKey == Biomes.DEEP_WARM_OCEAN) {
-                    event.getSpawns().getSpawner(EntityClassification.WATER_CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.JELLYFISH.get(), AnimaliaConfig.SPAWN.JellyfishWeight.get(), AnimaliaConfig.SPAWN.JellyfishMin.get(), AnimaliaConfig.SPAWN.JellyfishMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.WATER_CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.JELLYFISH.get(), AnimaliaConfig.SPAWN.JellyfishWeight.get(), AnimaliaConfig.SPAWN.JellyfishMin.get(), AnimaliaConfig.SPAWN.JellyfishMax.get()));
                 }
                 if (biomeKey == Biomes.OCEAN || biomeKey == Biomes.COLD_OCEAN || biomeKey == Biomes.FROZEN_OCEAN || biomeKey == Biomes.LUKEWARM_OCEAN || biomeKey == Biomes.WARM_OCEAN) {
-                    event.getSpawns().getSpawner(EntityClassification.WATER_CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.JELLYFISH.get(), AnimaliaConfig.SPAWN.LessJellyfishWeight.get(), AnimaliaConfig.SPAWN.LessJellyfishMin.get(), AnimaliaConfig.SPAWN.LessJellyfishMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.WATER_CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.JELLYFISH.get(), AnimaliaConfig.SPAWN.LessJellyfishWeight.get(), AnimaliaConfig.SPAWN.LessJellyfishMin.get(), AnimaliaConfig.SPAWN.LessJellyfishMax.get()));
                 }
-                if (biomeKey == Biomes.DESERT || event.getCategory() == Biome.Category.SAVANNA) {
-                    event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.VULTURE.get(), AnimaliaConfig.SPAWN.VultureWeight.get(), AnimaliaConfig.SPAWN.VultureMin.get(), AnimaliaConfig.SPAWN.VultureMax.get()));
+                if (biomeKey == Biomes.DESERT || event.getCategory() == Biome.BiomeCategory.SAVANNA) {
+                    event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.VULTURE.get(), AnimaliaConfig.SPAWN.VultureWeight.get(), AnimaliaConfig.SPAWN.VultureMin.get(), AnimaliaConfig.SPAWN.VultureMax.get()));
                 }
                 if (biomeKey == Biomes.LUKEWARM_OCEAN || biomeKey == Biomes.WARM_OCEAN || biomeKey == Biomes.DEEP_WARM_OCEAN || biomeKey == Biomes.DEEP_LUKEWARM_OCEAN) {
-                    event.getSpawns().getSpawner(EntityClassification.WATER_CREATURE).add(new MobSpawnInfo.Spawners(ModEntityTypes.WHITE_SHARK.get(), AnimaliaConfig.SPAWN.WhiteSharkWeight.get(), AnimaliaConfig.SPAWN.WhiteSharkMin.get(), AnimaliaConfig.SPAWN.WhiteSharkMax.get()));
+                    event.getSpawns().getSpawner(MobCategory.WATER_CREATURE).add(new MobSpawnSettings.SpawnerData(ModEntityTypes.WHITE_SHARK.get(), AnimaliaConfig.SPAWN.WhiteSharkWeight.get(), AnimaliaConfig.SPAWN.WhiteSharkMin.get(), AnimaliaConfig.SPAWN.WhiteSharkMax.get()));
                 }
             }
         }

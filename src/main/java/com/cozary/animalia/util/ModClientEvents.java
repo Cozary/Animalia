@@ -22,8 +22,8 @@
 package com.cozary.animalia.util;
 
 import com.cozary.animalia.entities.VultureEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
@@ -33,7 +33,7 @@ import static com.cozary.animalia.Animalia.MOD_ID;
 @EventBusSubscriber(modid = MOD_ID)
 public class ModClientEvents {
 
-    public static VultureEvent.SummonAidEvent fireVultureSummonAid(VultureEntity zombie, World world, int x, int y, int z, LivingEntity attacker, double summonChance) {
+    public static VultureEvent.SummonAidEvent fireVultureSummonAid(VultureEntity zombie, Level world, int x, int y, int z, LivingEntity attacker, double summonChance) {
         VultureEvent.SummonAidEvent summonEvent = new VultureEvent.SummonAidEvent(zombie, world, x, y, z, attacker, summonChance);
         MinecraftForge.EVENT_BUS.post(summonEvent);
         return summonEvent;

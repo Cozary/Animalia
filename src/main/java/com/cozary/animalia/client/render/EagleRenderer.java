@@ -24,16 +24,17 @@ package com.cozary.animalia.client.render;
 import com.cozary.animalia.Animalia;
 import com.cozary.animalia.client.model.EagleModel;
 import com.cozary.animalia.entities.EagleEntity;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import com.cozary.animalia.util.ClientEventBusSubscriber;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class EagleRenderer extends MobRenderer<EagleEntity, EagleModel<EagleEntity>> {
 
     protected static final ResourceLocation TEXTURE = new ResourceLocation(Animalia.MOD_ID, "textures/entity/eagle.png");
 
-    public EagleRenderer(EntityRendererManager renderManagerIn) {
-        super(renderManagerIn, new EagleModel<>(), 0.5F);
+    public EagleRenderer(EntityRendererProvider.Context context) {
+        super(context, new EagleModel<>(context.bakeLayer(ClientEventBusSubscriber.EAGLE)), 0.5F);
     }
 
     @Override
